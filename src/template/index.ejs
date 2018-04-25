@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <title>code-ui</title>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
+    <link rel="stylesheet" href="<%= htmlWebpackPlugin.files.css[0] %>">
+    <link rel="icon" href="<%= htmlWebpackPlugin.files.favicon %>">
+</head>
+
+<body>
+<div id="app"></div>
+<script type="text/javascript">
+    let userAgent = navigator.userAgent;
+    let isIE=window.ActiveXObject || "ActiveXObject" in window;
+    if (isIE) {
+        let reIE = new RegExp("MSIE (\\d+\\.\\d+);");
+        reIE.test(userAgent);
+        let fIEVersion = parseFloat(RegExp["$1"]);
+        if(userAgent.indexOf('MSIE 6.0')!=-1){
+            alert('IE10以下不支持，请升级浏览器');
+        } else if(fIEVersion == 7) {
+            alert('IE10以下不支持，请升级浏览器');
+        } else if(fIEVersion == 8) {
+            alert('IE10以下不支持，请升级浏览器');
+        } else if(fIEVersion == 9) {
+            alert('IE10以下不支持，请升级浏览器');
+        } else if(fIEVersion == 10) {
+            //do nothing
+        } else if(userAgent.toLowerCase().match(/rv:([\d.]+)\) like gecko/)){
+            //do nothing
+        } else {
+            alert('IE版本过低，请升级浏览器');
+        }//IE版本过低
+    }
+</script>
+<script type="text/javascript" src="<%= htmlWebpackPlugin.files.js[0] %>"></script>
+<script type="text/javascript" src="<%= htmlWebpackPlugin.files.js[1] %>"></script>
+</body>
+
+</html>
