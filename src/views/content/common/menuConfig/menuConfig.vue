@@ -64,9 +64,11 @@
                 <FormItem label="src" v-if="judgeUrlType" prop="url.url">
                     <Input v-model="currentNodeForm.url.url" :disabled="judgeConfForb"></Input>
                 </FormItem>
-                <FormItem label="动态表单配置" v-if="!judgeUrlType && judgeUrlComponent" prop="url">
+                <FormItem label="动态表单配置" v-if="!judgeUrlType && judgeUrlComponent" prop="url.url">
                     <Input v-model="currentNodeForm.url.url" :disabled="judgeConfForb"></Input>
                 </FormItem>
+            </Form>
+            <Form :model="currentNodeForm" :label-width="100" v-if="stats.tree.isSelecteOn">
                 <FormItem label="打开方式" v-if="!judgeContent && !judgeButton">
                     <Select v-model="currentNodeForm.url.openMethod" :disabled="judgeConfForb">
                         <Option value="default" label="默认">默认</Option>
@@ -145,7 +147,7 @@
                     functionName: {required: true, message: '资源名称不能为空', trigger: 'blur'},
                     code: {required: true, message: '资源编码不能为空', trigger: 'blur'},
                     'url.path': {type: "string", message: '菜单URL不能为空',required: true, trigger: 'blur'},
-                    'url.url': {required: true, message: '动态表单配置不能为空', trigger: 'blur'},
+                    'url.url': {required: true, message: '配置不能为空', trigger: 'blur'},
                     'url.component': {required: true, message: '显示方式不能为空', trigger: 'change'},
                     enabled: {required: true, message: '请选择是否有效', trigger: 'change'},
                 }

@@ -80,7 +80,6 @@
                 </Upload>
             </FormItem>
             <FormItem v-if="config.tabConfigData.buttonConfigs && config.tabConfigData.buttonConfigs.length>0" v-for="(btn, index) in config.tabConfigData.buttonConfigs" :key="btn.btnId">
-                <!--<role-button :type="btn.btnType" :menuId="btn.btnId" @click="btnFunction(btn.btnId, btn.btnConfig)">{{btn.btnName}}</role-button>-->
                 <div :id="'btnFrom-'+btn.btnId"></div>
             </FormItem>
         </Form>
@@ -145,7 +144,7 @@
                 childModelShow: false,
                 childModelTitle: '',
                 childConfig: {},
-                childRequestFlag: '', //add 新增, update 更新
+                childRequestFlag: '' //add 新增, update 更新
             };
         },
         props:{
@@ -387,14 +386,20 @@
                                 }, item.text);
                             }).concat(otherAction.map(item => {
                                 let data = params.row;
-                                let options = require	('../../../views/content/' + item.config.component).default;
-                                let a = Vue.extend(options);
+                                let options = require ('../../../views/content/' + item.config.component).default;
+                                let a = new Vue({
+                                    extends: options,
+                                    created(){
+                                        this.parentData = data;
+                                    }
+                                });
                                 let _this = this;
-                                return h(a, {props: {parentData: data}, on:{
+                                let b = h(Vue.extend(a.$options), {on:{
                                     refreshTable: function () {
                                         _this.search();
                                     }
                                 }});
+                                return b;
                             })));
                         }
                     };
@@ -715,21 +720,6 @@
                         }
                     });
                 }, 1000);
-            },
-            btnFunction(menuId, url, data){
-                let temp = document.createElement("div");
-                temp.id = data? menuId + '-row': menuId;
-                if (this.$refs[temp.id + '-render-child']) {
-                    this.$refs[temp.id + '-render-child'].$destroy();
-                    this.$refs[temp.id + '-render-child'].$el.remove();
-                }
-                this.$el.appendChild(temp);
-                this.$nextTick(()=>{
-                    let options = require	('../../../views/content/' + url.component).default;
-                    let a = Vue.extend(options);
-                    let b = new a({router: this.$router, store: this.$store, propsData: {parentData: data?data: this.tableData}, parent: this}).$mount(temp);
-                    this.$refs[temp.id + '-render-child'] = b;
-                });
             }
         },
         mounted(){
@@ -738,14 +728,19 @@
                 this.config.tabConfigData.buttonConfigs.forEach((btn)=>{
                     let options = require	('../../../views/content/' + btn.btnConfig.component).default;
                     let a = Vue.extend(options);
-                    new a({
+                    let b = new a({
                         router: this.$router,
                         store: this.$store,
-                        propsData: {parentData: this.tableData},
-                        parent: this
+                        parent: this,
+                        computed: {
+                            parentData(){
+                                return _this.tableData;
+                            }
+                        }
                     }).$on('refreshTable', function () {
                         _this.search();
-                    }).$mount("#btnFrom-" + btn.btnId);
+                    });
+                    b.$mount("#btnFrom-" + btn.btnId);
                 });
             }
         }

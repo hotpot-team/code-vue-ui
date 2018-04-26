@@ -48,7 +48,7 @@
                         } else {
                             let obj = JSON.parse(p.url);
                             let compName = obj.component.replace('.vue','');
-                            obj.compName = compName;
+                            obj.compName = compName.replace(/\//g,'-');
                             obj.componentType = 4;
                             this.childrenConfig.push(obj);
                         }
