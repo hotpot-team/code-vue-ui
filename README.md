@@ -54,10 +54,7 @@
 
 ### 自定义按钮
 
-<font color=#f34b1e>注意：新增目录、菜单、按钮任意一项都需要在角色配置添加对应访问权限（包含管理员）</font>
-
-1. 在菜单管理界面添加自定义按钮的vue文件
-![table-btn](./doc/images/2018-04-26_163626.jpg)
+1. 在文件路径src/views/content/下添加自定义vue
 
 ```vue
 <template>
@@ -85,7 +82,11 @@
 
 ***refreshTable:*** 触发父组件刷新表格数据, 通过this.$emit('refreshTable')调用;
 
+2. 菜单配置在对应菜单中添加自定义按钮
+![table-btn](./doc/images/2018-04-26_163626.jpg)
+
 2. 在角色管理中添加访问权限
+<font color=#f34b1e>注意：新增目录、菜单、按钮任意一项都需要在角色配置添加对应访问权限（包含管理员）</font>
 ![role-config-tableBtn](./doc/images/2018-04-26_163816.jpg)
 
 3. 表格配置点击按钮后新增（可以通过预览查看是否添加成功），保存配置
