@@ -50,7 +50,7 @@
     "iview-loader": "^1.1.0",
     "less": "^2.7.3",
     "less-loader": "^4.0.5",
-    "node-sass": "^4.8.3",
+    "node-sass": "^4.9.0",
     "sass-loader": "^4.0.2",
     "style-loader": "^0.19.1",
     "url-loader": "^0.6.2",
