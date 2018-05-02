@@ -59,13 +59,19 @@
                     align: 'center'
                 },{
                     title: '登录名',
-                    key: 'userName'
+                    render:(h, param)=>{
+                        return h('span',{}, param.row.hotpotUser.userName);
+                    }
                 },{
                     title: '昵称',
-                    key: 'name'
+                    render:(h, param)=>{
+                        return h('span',{}, param.row.hotpotUser.name);
+                    }
                 },{
                     title: '组织',
-                    key: 'orgFullName'
+                    render:(h, param)=>{
+                        return h('span',{}, param.row.hotpotOrganization.orgFullName);
+                    }
                 }],
                 personData:[],
                 companyCol:[{
@@ -163,7 +169,7 @@
             },
             personDelete(ref){
                 let arr = this.$refs[ref].getSelection().map((item)=>{
-                   return item.id;
+                   return item.hotpotUser.id;
                 });
                 this.$http.post('/roleMag/'+this.$route.query.roleId + '/partys/delete',arr).then((res)=>{
                     if (res.status === 200) {
