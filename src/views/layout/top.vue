@@ -22,7 +22,7 @@
                 <Icon type="arrow-down-b"></Icon>
             </a>
             <DropdownMenu slot="list">
-                <DropdownItem name="info">个人信息</DropdownItem>
+                <DropdownItem name="info" v-if="showInfo">个人信息</DropdownItem>
                 <DropdownItem name="logout">注销</DropdownItem>
             </DropdownMenu>
         </Dropdown>
@@ -35,6 +35,7 @@
     export default {
         data(){
             return {
+                showInfo: false
             }
         },
         computed: ({
@@ -46,6 +47,17 @@
             ])
         }),
         created(){
+            let arr = this.$store.getters.menuArray;
+            for (let i = 0; i < arr.length; i++ ) {
+                let menu = arr[i];
+                if (menu.url && menu.url !== '') {
+                    let config = JSON.parse(menu.url);
+                    if (config.component === 'common/personSet.vue') {
+                        this.showInfo = true;
+                        break;
+                    }
+                }
+            }
         },
         methods:{
             ...mapMutations({
