@@ -79,7 +79,10 @@
                     width: 60,
                     align: 'center'
                 },{
-                    title: '公司名',
+                    title: '组织',
+                    key: 'orgFullName'
+                },{
+                    title: '组织名',
                     key: 'orgName'
                 },{
                     title: '描述',
@@ -152,7 +155,7 @@
             addPerson(data){
                 let map = new Map();
                 this.personData.forEach((item)=>{
-                    map.set(item.id, item)
+                    map.set(item.hotpotUser.id, item)
                 });
                 let arr = [];
                 data.personList.forEach((item)=>{
@@ -168,8 +171,13 @@
                 });
             },
             personDelete(ref){
-                let arr = this.$refs[ref].getSelection().map((item)=>{
-                   return item.hotpotUser.id;
+                let arr = [];
+                arr = this.$refs[ref].getSelection().map((item)=>{
+                    if (ref === 'personTable'){
+                        return item.hotpotUser.id;
+                    } else {
+                        return item.id;
+                    }
                 });
                 this.$http.post('/roleMag/'+this.$route.query.roleId + '/partys/delete',arr).then((res)=>{
                     if (res.status === 200) {

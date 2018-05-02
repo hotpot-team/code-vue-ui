@@ -54,12 +54,10 @@
             topClick(name) {
                 if (name === 'logout') {
                     this.$http.get('/logout').then((response)=>{
-                        debugger
                         this.changeLoginInfo({ authToken: '', username: '', loginId: '' });
                         window.localStorage.removeItem('loginInfo');
                         this.$router.push({path: Util.indexUrl});
                     }).catch(function (e) {
-                        debugger
                         window.localStorage.removeItem('loginInfo');
                         window.location.href = "/";
                     });
