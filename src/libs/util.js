@@ -4,7 +4,7 @@ let util = {
     appName: 'demo',
     baseUrl: '/' + 'demo'
 };
-let devUrl =  'http://127.0.0.1:8088';
+let devUrl =  'http://127.0.0.1:8090';
 let testUrl = 'http://127.0.0.1:8080';
 let proUrl = 'http://127.0.0.1:8080';
 
