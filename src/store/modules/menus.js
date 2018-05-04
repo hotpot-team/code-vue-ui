@@ -41,7 +41,10 @@ const actions = {
     },
     getMenus({commit, state}, config) {
         commit(types.MENU_LIST, config);
-    }
+    },
+    clearMenu({commit, state}){
+
+    },
 };
 
 // mutations
@@ -122,6 +125,14 @@ const mutations = {
                 router.push({path: Util.indexUrl});
             }
         });
+    },
+    [types.CLEAR_MENU](state){
+        state.currentMenu = {
+            id: ''
+        };
+        state.menus = [];
+        state.breadCrumbList = [];
+        state.titleBread = [];
     }
 };
 

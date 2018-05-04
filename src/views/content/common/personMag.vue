@@ -248,7 +248,6 @@
                 this.modalStats.formData = Object.assign({},row.hotpotUser);
                 this.modalStats.formData.orgName = row.hotpotOrganization.orgName;
                 this.modalStats.formData.orgId = row.hotpotOrganization.orgId;
-                console.log(row)
             },
             deletePerson (row) {
                 this.$Modal.confirm({

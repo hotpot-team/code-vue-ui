@@ -181,11 +181,9 @@
                 this.stats.isNewOrg = false;
                 this.$refs.formValid.resetFields();
                 this.modalForm = Object.assign({},row);
-                console.log(row)
             },
             parentOrgSel (parent) {
                 if (parent.orgList.length) {
-                    console.log(parent.orgList[0])
                     this.modalForm.orgFullId = parent.orgList[0].orgFullId;
                     this.modalForm.parentId = parent.orgList[0].id;
                     this.modalForm.orgFullName = parent.orgList[0].orgFullName + '/' + this.modalForm.orgName;

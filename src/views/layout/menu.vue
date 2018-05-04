@@ -27,7 +27,7 @@
     <div class="left-menu">
         <div class="logo"><img src="../../assets/images/icon.png"/><span style="margin-left: 8px">{{title}}</span></div>
         <div class="hide-scroll">
-            <MenuTree :data="menus"></MenuTree>
+            <MenuTree v-if="menus && menus.length > 0 && currentMenu && currentMenu.id != ''" :data="menus"></MenuTree>
         </div>
     </div>
 </template>

@@ -13,6 +13,10 @@ const mutations = {
     [types.UPDATE_UI_CONFIG](state, {data, version}) {
         state.uiConfigData = data;
         state.uiVersion = version;
+    },
+    [types.CLEAR_CONFIG](state){
+        state.uiConfigData={};
+        state.uiVersion = -1;
     }
 };
 
@@ -70,6 +74,9 @@ const actions = {
                 resolve();
             });
         });
+    },
+    clearConfig({commit, state}){
+        commit(types.CLEAR_CONFIG);
     }
 };
 

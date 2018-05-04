@@ -38,6 +38,9 @@ const actions = {
                 }
             });
         }
+    },
+    clearDict({commit, state}){
+        commit(types.CLEAR_DICT);
     }
 };
 
@@ -70,6 +73,10 @@ const mutations = {
                 }
             });
         }
+    },
+    [types.CLEAR_DICT](state){
+        state.dictstroage = [];
+        state.dictVersion = 1111111111;
     }
 };
 

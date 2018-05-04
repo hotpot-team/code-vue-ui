@@ -31,7 +31,7 @@
 <script>
     import { mapState, mapMutations, mapGetters } from 'vuex';
     import VueRouter from 'vue-router';
-    import Util from '../../libs/util'
+    import Util from '../../libs/util';
     export default {
         data(){
             return {
@@ -66,12 +66,15 @@
             topClick(name) {
                 if (name === 'logout') {
                     this.$http.get('/logout').then((response)=>{
-                        this.changeLoginInfo({ authToken: '', username: '', loginId: '' });
+                        this.$store.commit('CLEAR_CONFIG');
                         window.localStorage.removeItem('loginInfo');
-                        this.$router.push({path: Util.indexUrl});
+                        this.$store.commit('CLEAR_MENU');
+                        this.$store.dispatch('clearLogin').then(()=>{
+                            this.$router.push({path: Util.indexUrl});
+                        });
                     }).catch(function (e) {
                         window.localStorage.removeItem('loginInfo');
-                        window.location.href = "/";
+                        window.location.href = Util.indexUrl;
                     });
                 } else if (name === 'info') {
                     this.$router.push({path: '/main/p/setting'})

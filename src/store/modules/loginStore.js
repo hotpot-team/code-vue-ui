@@ -1,4 +1,5 @@
 import Util from '../../libs/util';
+import * as types from '../mutation-types';
 const LOGINSTATUS = 'LOGINSTATUS';
 const CHANGELOGININFO = 'CHANGELOGININFO';
 const SHOWMODAL = 'SHOWMODAL';
@@ -26,6 +27,17 @@ const mutations = {
     },
     [CHANGELOGININFO](state, data) {
         state.loginInfo = data;
+    },
+    [types.CLEAR_LOGIN](state){
+        state.loginStatus = false;
+        state.modalShow = false;
+        state.loginInfo = {
+            authToken: '',
+            name: '',
+            loginId: '',
+            organizationId: '',
+            departmentId: ''
+        };
     }
 };
 
@@ -44,6 +56,9 @@ const actions = {
             window.localStorage.loginInfo = JSON.stringify(info);
             commit(CHANGELOGININFO, info);
         }).catch(function() {});
+    },
+    clearLogin({commit, state}){
+        commit(types.CLEAR_LOGIN);
     }
 };
 
