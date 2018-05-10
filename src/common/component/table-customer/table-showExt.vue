@@ -176,7 +176,7 @@
                 this.searchForm = Object.values(this.config.tabConfigData.searchForm).sort((a, b) => {
                     return a.sortIndex - b.sortIndex;
                 });
-                this.searchForm.forEach((obj, index) => {
+                this.searchForm.forEach((obj) => {
                     this.$set(this.formParam, obj.name, '');
                     //获取对应字典
                     if (obj.dictName) {
@@ -192,9 +192,9 @@
             //构建Table
             if (this.config.tabConfigData.tableColumns) {
                 let arr = Object.values(this.config.tabConfigData.tableColumns).sort((a, b) => {
-                   return a.sortIndex - b.sortIndex;
+                    return a.sortIndex - b.sortIndex;
                 });
-                arr.forEach((obj, index, array)=>{
+                arr.forEach((obj)=>{
                     if (obj.isShow) {
                         let dictValues = null;
                         // 是否是字典
@@ -279,7 +279,7 @@
                     this.searchParams.pageParms.pageIndex = 0;
             },
             editSearchParams(){
-                this.searchForm.forEach((obj, index) => {
+                this.searchForm.forEach((obj) => {
                     if (obj.searchModel === 'RANGE') {
                         let arr= [{name:'-min', operator: 'GTE'},{name:'-max', operator: 'LTE'}];
                         for (let i=0; i < arr.length; i++) {
@@ -474,7 +474,7 @@
                                 this.searchPost(this.searchParams);
                                 this.$Message.info('删除成功');
                             }
-                        }).catch((e) => {
+                        }).catch(() => {
                             this.$Message.error('删除失败');
                         });
                     },
@@ -486,7 +486,7 @@
             },
             clearSearchForm() {
                 this.$refs['searchValidate'].resetFields();
-                this.searchForm.forEach((obj, index) => {
+                this.searchForm.forEach((obj) => {
                     if (obj.searchModel === 'RANGE') {
                         let arr = ['-min', '-max'];
                         for (let i=0; i < arr.length; i++) {
@@ -508,7 +508,7 @@
                     for (let i=0; i < arrayParam.length; i++) {
                         let param = arrayParam[i].replace(this.tableName, '').replace(/( |^)[A-Z]/g, (L) => L.toLowerCase());
                         if (data.hasOwnProperty(param)) {
-                            let re = new RegExp("\{" + arrayParam[i] + "\}");
+                            let re = new RegExp('\{' + arrayParam[i] + '\}');
                             url = url.replace(re, data[param]);
                         }
                     }
@@ -528,9 +528,9 @@
                 let url = Util.url + '/' + Util.baseUrl + '/api/common/excel/template/download';
                 let fileName = excelTitle + '_导入模板.xlsx';
                 let reqData = {
-                    "excelTitle": [],
-                    "tableName": this.config.tableMappingName,
-                    "excelHeader": excelTitle + "数据"
+                    'excelTitle': [],
+                    'tableName': this.config.tableMappingName,
+                    'excelHeader': excelTitle + '数据'
                 };
                 let i = 0;
                 for (let key in this.config.formConfigData) {
@@ -552,20 +552,20 @@
                 xhr.setRequestHeader('AUTH_TOKEN', this.$store.getters.loginInfo.authToken);
                 xhr.setRequestHeader('CURRENT_USER', this.$store.getters.loginInfo.loginId);
                 xhr.setRequestHeader('Content-Type', 'application/json');
-                xhr.responseType = "blob";
+                xhr.responseType = 'blob';
                 xhr.onload = function () {
                     if (this.status === 200) {
                         let blob = this.response;
                         if (navigator.appVersion.toString().indexOf('.NET') > 0) {
-                          window.navigator.msSaveBlob(blob, fileName);
+                            window.navigator.msSaveBlob(blob, fileName);
                         } else {
-                          let body = document.body;
-                          let a = document.createElement('a');
-                          a.download = fileName;
-                          a.href = URL.createObjectURL(blob);
-                          body.appendChild(a);
-                          a.click();
-                          body.removeChild(a);
+                            let body = document.body;
+                            let a = document.createElement('a');
+                            a.download = fileName;
+                            a.href = URL.createObjectURL(blob);
+                            body.appendChild(a);
+                            a.click();
+                            body.removeChild(a);
                         }
                     } else {
                         compVue.$Message.error('文件下载失败');
@@ -595,25 +595,25 @@
                     for (let key in this.initParam.export) {
                         let searchparam = {};
                         searchparam.field = key;
-                        searchparam.operator = "EQ";
+                        searchparam.operator = 'EQ';
                         searchparam.value = this.initParam.export[key];
                         searchp.push(searchparam);
                     }
                 }
                 let reqData = {
-                    "excelTitle": [],
-                    "tableName": this.config.tableMappingName,
-                    "excelHeader": excelTitle + "数据",
-                    "pageDTO": {
-                        "collection": {
-                            "filters": searchp
+                    'excelTitle': [],
+                    'tableName': this.config.tableMappingName,
+                    'excelHeader': excelTitle + '数据',
+                    'pageDTO': {
+                        'collection': {
+                            'filters': searchp
                         },
-                        "orders": [],
-                        "pageParms": {
-                            "autoRecordCount": true,
-                            "pageIndex": 0,
-                            "pageSize": 0,
-                            "recordCount": 0
+                        'orders': [],
+                        'pageParms': {
+                            'autoRecordCount': true,
+                            'pageIndex': 0,
+                            'pageSize': 0,
+                            'recordCount': 0
                         }
                     }
                 };
@@ -632,7 +632,7 @@
                 this.download(url, fileName, reqData, 'export');
             },
             // 处理没有选择Excel文件的情况
-            handleImportFormatError(file){
+            handleImportFormatError(){
                 this.$Message.error('请选择Excel文件');
             },
             // 导入文件
@@ -659,7 +659,8 @@
                                     }
                                 }
                                 // 生成excel对应参数数组
-                                let i = 0, excelTitleArr = [];
+//                                let i = 0, excelTitleArr = [];
+                                let i =0;
                                 for (let key in this.config.formConfigData) {
                                     formdata.append('excelTitle[' + i + '].fieldName', this.config.formConfigData[key].mappingName);
                                     formdata.append('excelTitle[' + i + '].attrName', this.config.formConfigData[key].name);
@@ -676,14 +677,14 @@
                                 };
                                 // 上传参数和文件
                                 this.$http.post(this.config.pathmag.import_excel.uri, formdata, config).then((res) => {
-                                    if (res.data.statusCode == "0") {
+                                    if (res.data.statusCode == '0') {
                                         this.excelReport = res.data.excelReport;
                                         this.excelImportReport();
                                     } else {
                                         this.importLoading = false;
                                         this.$Message.error('导入数据发生异常');
                                     }
-                                }).catch((error) => {
+                                }).catch(() => {
                                     this.importLoading = false;
                                     this.$Message.error('导入数据发生异常');
                                 });
@@ -701,20 +702,20 @@
             // 导入数据结果报告
             excelImportReport() {
                 let report = this.excelReport, me = this;
-                let reportDetail = "<p>导入总条数: " + report.total + "，成功" + report.successTotal + "条，<span style='color: red'>失败" + report.failedTotal + "条</span></p>"
+                let reportDetail = '<p>导入总条数:' + report.total + '，成功' + report.successTotal + '条，<span style="color: red">失败' + report.failedTotal + '条</span></p>';
                 if (report.failedDetails.length > 0) {
-                    reportDetail += "<br/><p>失败行详情：</p>";
+                    reportDetail += '<br/><p>失败行详情：</p>';
                     for (let i = 0;i < report.failedDetails.length;i++) {
-                        reportDetail += "<p>第" + report.failedDetails[i].index + "行：" + report.failedDetails[i].failedReason + "</p>"
+                        reportDetail += '<p>第' + report.failedDetails[i].index + '行：' + report.failedDetails[i].failedReason + '</p>';
                     }
                 }
                 // 延时一段时间防止modal消失
                 setTimeout(function(){
                     me.importLoading = false;
                     me.$Modal.success({
-                        title: "数据导入成功，耗时：" + report.timeCost + "毫秒",
+                        title: '数据导入成功，耗时：' + report.timeCost + '毫秒',
                         content: reportDetail,
-                        width: "600px",
+                        width: '600px',
                         onOk: () => {
                             me.searchPost(me.searchParams);
                         }
@@ -726,7 +727,7 @@
             let _this = this;
             if(this.config.tabConfigData.buttonConfigs && this.config.tabConfigData.buttonConfigs.length > 0) {
                 this.config.tabConfigData.buttonConfigs.forEach((btn)=>{
-                    let options = require	('../../../views/content/' + btn.btnConfig.component).default;
+                    let options = require('../../../views/content/' + btn.btnConfig.component).default;
                     let a = Vue.extend(options);
                     let b = new a({
                         router: this.$router,
@@ -740,7 +741,7 @@
                     }).$on('refreshTable', function () {
                         _this.search();
                     });
-                    b.$mount("#btnFrom-" + btn.btnId);
+                    b.$mount('#btnFrom-' + btn.btnId);
                 });
             }
         }

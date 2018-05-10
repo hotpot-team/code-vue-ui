@@ -157,7 +157,7 @@
                 title="人员选择"
                 :width="600"
                 @on-ok="completeSelect"
-                :transfer="false">
+                :transfer="true">
             <div class="person-select-content" :style="single?'height:383px': 'height:415px'">
                 <div class="left-content">
                     <div class="person-list left">
@@ -209,7 +209,7 @@
     </div>
 </template>
 <script>
-    import Util from '../../../libs/util';
+    //import Util from '../../../libs/util';
     import TreeUtil from '../../../treeUtil';
     export default {
         props: {
@@ -280,7 +280,7 @@
                     key: 'name',
                     ellipsis: true,
                     render: (h, params) => {
-                        return h('span',params.row.hotpotUser.name + " " +  params.row.hotpotOrganization.orgFullName);
+                        return h('span',params.row.hotpotUser.name + ''  +  params.row.hotpotOrganization.orgFullName);
                     }
                 }],
                 result:{
@@ -320,7 +320,7 @@
                 }).then((response) => {
                     this.depTree = TreeUtil.transformToTreeFormat(response.data.data);
                     this.treeLoading = false;
-                }).catch(function(e) {
+                }).catch(function() {
                     this.treeLoading = false;
                 });
             },
@@ -330,16 +330,16 @@
                     collection: {
                         filters: [
                             {
-                                field: "hotpotUser.name",
-                                operator: "LIKE",
+                                field: 'hotpotUser.name',
+                                operator: 'LIKE',
                                 value: this.keyWords
                             }
                         ]
                     },
                     orders: [
                         {
-                            fieldName: "hotpotUser.createdAt",
-                            orderType: "DESC"
+                            fieldName: 'hotpotUser.createdAt',
+                            orderType: 'DESC'
                         }
                     ],
                     pageParms: {

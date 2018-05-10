@@ -176,9 +176,9 @@
     </div>
 </template>
 <script>
-    import MyTable from '../table/table.vue'
+    import MyTable from '../table/table.vue';
     import Util from '../../../libs/util';
-    import TableShow from "./table-showExt.vue";
+    import TableShow from './table-showExt.vue';
 
     export default {
         data() {
@@ -222,7 +222,7 @@
                                     on:{'click':()=>{
                                         this.relationConfig(params.row);
                                     }}
-                                },params.row.relationType)
+                                },params.row.relationType);
                             } else {
                                 return '';
                             }
@@ -263,7 +263,7 @@
                 ], //表头
                 data: [],
                 checkBoxs: {isAdd: false, isModify: false, isDelete: false, isPage: false, isImport: false}, //页面配置checkbox
-                importExcelConfig: {isVersion: false, excelHeader: ""}, // excel导入配置,
+                importExcelConfig: {isVersion: false, excelHeader: ''}, // excel导入配置,
                 currentIndex: 0,
                 modalShow: false,
                 buttonShow: false,
@@ -271,7 +271,7 @@
                 buttons: [],
                 buttonConfigs:[],
                 rowButtonConfigs:[]
-            }
+            };
         },
         created() {
             // 所有可自定义按钮
@@ -324,7 +324,7 @@
                     sortData.push(columsData[i]);
                 } else {
                     this.$set(columsData[i], '_highlight', false);
-                    this.data.push(columsData[i])
+                    this.data.push(columsData[i]);
                 }
             }
             //排序之后添加
@@ -352,13 +352,13 @@
                 if (tabConfigData.isModify) {
                     tabConfigData.action.push({
                         text: '修改',
-                        type:"primary"
+                        type:'primary'
                     });
                 }
                 if (tabConfigData.isDelete) {
                     tabConfigData.action.push({
                         text: '删除',
-                        type:"error"
+                        type:'error'
                     });
                 }
                 tabConfigData.buttonConfigs = JSON.parse(JSON.stringify(this.buttonConfigs));
@@ -485,5 +485,5 @@
                 });
             }
         }
-    }
+    };
 </script>

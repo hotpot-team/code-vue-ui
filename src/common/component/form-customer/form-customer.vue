@@ -182,7 +182,7 @@
                 buttons: [],
                 buttonShow: false,
                 buttonConfigs:[]
-            }
+            };
         },
         created() {
             // 所有可自定义按钮
@@ -234,7 +234,7 @@
                         sortData.push(columsData[i]);
                     } else {
                         this.$set(columsData[i], '_highlight', false);
-                        this.formData.push(columsData[i])
+                        this.formData.push(columsData[i]);
                     }
                 }
             }
@@ -347,5 +347,5 @@
                 });
             }
         }
-    }
+    };
 </script>

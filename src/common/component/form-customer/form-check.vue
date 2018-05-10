@@ -33,7 +33,7 @@
                 <CheckboxGroup v-model="column.personInput">
                     <Checkbox label="single"><span>单选</span></Checkbox>
                     <Checkbox label="person"><span>人员</span></Checkbox>
-                    <Checkbox label="org"><span>部门</span></Checkbox>
+                    <Checkbox label="org"><span>组织</span></Checkbox>
                 </CheckboxGroup>
             </FormItem>
         </Form>
@@ -43,7 +43,7 @@
     export default {
         data() {
             return {
-            }
+            };
         },
         created() {
             this.initRule();
@@ -52,7 +52,7 @@
         components: {
         },
         watch:{
-            column(val, old){
+            column(){
                 this.initRule();
             }
         },
@@ -76,7 +76,8 @@
             },
             saveRule(column){
                 if (column.required && !column.ruleValidate.required) {
-                    column.ruleValidate.required = {required: true, message: column.title + '不能为空', type: (column.format && column.format === 'date-time')? 'date': 'string', trigger: (column.format && column.format === 'date-time')? 'change': 'blur'}
+                    let triggerType = ((column.format && column.format === 'date-time') || (column.personInput && column.personInput.length > 0) || column.dictName)? 'change': 'blur';
+                    column.ruleValidate.required = {required: true, message: column.title + '不能为空', type: (column.format && column.format === 'date-time')? 'date': 'string', trigger: triggerType};
                 }
                 if (column.ruleValidate.regex && column.ruleValidate.regex.pattern.length === 0) {
                     delete column.ruleValidate['regex'];
@@ -102,5 +103,5 @@
                 }
             }
         }
-    }
+    };
 </script>

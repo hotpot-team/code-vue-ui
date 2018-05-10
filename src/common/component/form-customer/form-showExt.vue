@@ -44,13 +44,12 @@ export default {
         if (!this.config.formConfigData) {
             return;
         }
-
         //排序
         this.formItemList = Object.values(this.config.formConfigData).sort((a, b) => {
             return a.sortIndex - b.sortIndex;
         });
         let code = window.localStorage.dictstroage && JSON.parse(window.localStorage.dictstroage) || [];
-        this.formItemList.forEach((obj, index) => {
+        this.formItemList.forEach((obj) => {
             // 验证规则
             if (obj.isValidate && obj.ruleValidate) {
                 let rules = Object.values(JSON.parse(JSON.stringify(obj.ruleValidate)));
@@ -69,7 +68,7 @@ export default {
             //获取对应字典
             if (obj.dictName) {
                 let result = code.filter((item) => {
-                   return item.code === obj.dictName;
+                    return item.code === obj.dictName;
                 });
                 if (result.length > 0) {
                     this.$set(this.dictList, obj.name, result[0].value);
@@ -84,7 +83,7 @@ export default {
     },
     methods: {
         getData(data){
-            return new Promise((resolve, reject)=>{
+            return new Promise((resolve,reject)=>{
                 if (!this.config.pathmag.detail || !this.config.pathmag.detail.uri) {
                     this.$Message.error('请配置请求地址');
                     resolve();
@@ -96,19 +95,21 @@ export default {
                         this.formData = Object.assign({}, this.formData, response.data[this.tableName]);
                         resolve(this.formData);
                     }
-                }).catch((e) => {
+                }).catch(() => {
                     // 错误提示
                     resolve();
+                    reject();
                     this.$Message.error('获取数据失败');
                 });
             });
         },
         updateData(){
-            return new Promise((resolve, reject)=>{
+            return new Promise((resolve,reject)=>{
                 this.$refs['formValidate'].validate((valid) => {
                     if (valid) {
                         if (!this.config.pathmag.update || !this.config.pathmag.update.uri) {
                             resolve();
+                            reject();
                         }
                         let updateUrl = this.editUrl(this.formData, this.config.pathmag.update.uri);
                         let data = Object.assign({}, this.formData);
@@ -122,9 +123,10 @@ export default {
                                 this.$Message.info('更新成功');
                             }
                             resolve(200);
-                        }).catch((e) => {
+                        }).catch(() => {
                             // 错误提示
                             resolve();
+                            reject();
                             this.$Message.error('更新失败');
                         });
                     }
@@ -146,6 +148,7 @@ export default {
                                 this.$Message.info('创建成功');
                             }
                             resolve(200);
+                            reject();
                         });
                     }
                 });
@@ -155,7 +158,7 @@ export default {
             for (let key in this.formData) {
                 this.formData[key] = '';
             }
-            this.$refs.formValidate.resetFields();
+            this.$refs['formValidate'].resetFields();
         },
         editUrl(data, url) {
             //正则匹配出所有{}
@@ -164,7 +167,7 @@ export default {
                 for (let i=0; i < arrayParam.length; i++) {
                     let param = arrayParam[i].replace(this.tableName, '').replace(/( |^)[A-Z]/g, (L) => L.toLowerCase());
                     if (data.hasOwnProperty(param)) {
-                        let re = new RegExp("\{" + arrayParam[i] + "\}");
+                        let re = new RegExp('\{' + arrayParam[i] + '\}');
                         url = url.replace(re, data[param]);
                     } else {
                         this.$Message.info('请配置正确的详情参数');
@@ -178,9 +181,9 @@ export default {
     mounted(){
         if(this.config._buttonConfigs && this.config._buttonConfigs.length > 0) {
             this.config._buttonConfigs.forEach((btn)=>{
-                let options = require	('../../../views/content/' + btn.btnConfig.component).default;
+                let options = require('../../../views/content/' + btn.btnConfig.component).default;
                 let a = Vue.extend(options);
-                new a({router: this.$router, store: this.$store, propsData: {parentData: this.formData}, parent: this}).$mount("#btnFrom-" + btn.btnId);
+                new a({router: this.$router, store: this.$store, propsData: {parentData: this.formData}, parent: this}).$mount('#btnFrom-' + btn.btnId);
             });
         }
     }
