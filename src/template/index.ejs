@@ -13,12 +13,12 @@
 <body>
 <div id="app"></div>
 <script type="text/javascript">
-    let userAgent = navigator.userAgent;
-    let isIE=window.ActiveXObject || "ActiveXObject" in window;
+    var userAgent = navigator.userAgent;
+    var isIE=window.ActiveXObject || "ActiveXObject" in window;
     if (isIE) {
-        let reIE = new RegExp("MSIE (\\d+\\.\\d+);");
+        var reIE = new RegExp("MSIE (\\d+\\.\\d+);");
         reIE.test(userAgent);
-        let fIEVersion = parseFloat(RegExp["$1"]);
+        var fIEVersion = parseFloat(RegExp["$1"]);
         if(userAgent.indexOf('MSIE 6.0')!=-1){
             alert('IE10以下不支持，请升级浏览器');
         } else if(fIEVersion == 7) {
