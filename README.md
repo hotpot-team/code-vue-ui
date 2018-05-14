@@ -6,6 +6,12 @@
 
 ### cmd进入工程目录 执行npm install
 
+#### node sass安装失败
+
+1. 如果遇到安装node-sass无法连接github的情况，先下载对应版本的`win32-x64-46_binding.node`（注意46表示对应的nodejs版本），然后放到某个文件夹下面，如`D:/node-sass/win32-x64-46_binding.node`，重新运行`npm rebuild node-sass`、`set SASS_BINARY_PATH=D:/node-sass/win32-x64-46_binding.node`和`npm i node-sass`。
+
+2. 如果遇到windows的npm安装文件没有权限，则运行`npm config edit`，找到`prefix`配置项，然后这项改为`C:\Users\wenxing\AppData\Roaming\npm`。
+
 ### 安装完成后执行 npm run dev
 
 ### 运行结果
