@@ -3,7 +3,7 @@
 </style>
 <template>
     <div>
-        <Form ref="formValidate" :model="formData" :rules="ruleValidate" :label-width="100">
+        <Form ref="formValidate" :model="formData" :rules="ruleValidate" :label-width="100" @submit.native.prevent>
             <FormItem v-for="(item, index) in formItemList" v-if="item.isShow || item.required" :key="index" :label="item.title || item.name" :prop="item.name">
                 <Select v-if="item.dictName && dictList[item.name]" v-model="formData[item.name]" >
                     <Option v-for="opt in dictList[item.name]" :value="opt.value" :key="opt.value + ''">{{ opt.name }}</Option>
@@ -13,7 +13,7 @@
                 <Input v-else v-model="formData[item.name]" ></Input>
             </FormItem>
 
-            <FormItem v-if="config._buttonConfigs && config._buttonConfigs.length>0" v-for="(btn, index) in config._buttonConfigs" :key="btn.btnId">
+            <FormItem v-if="config.formBtnConfigs && config.formBtnConfigs.length>0" v-for="(btn, index) in config.formBtnConfigs" :key="btn.btnId">
                 <div :id="'btnFrom-'+btn.btnId"></div>
             </FormItem>
         </Form>
@@ -77,7 +77,7 @@ export default {
         });
         //表名
         if (this.config.tableMappingName){
-            this.tableName = this.config.tableMappingName.replace(/_(\w)/g, ($0,$1) => $1.toUpperCase());
+            this.tableName = this.config.tableMappingName.toLowerCase().replace(/_(\w)/g, ($0,$1) => $1.toUpperCase());
         }
 
     },
@@ -179,8 +179,8 @@ export default {
         }
     },
     mounted(){
-        if(this.config._buttonConfigs && this.config._buttonConfigs.length > 0) {
-            this.config._buttonConfigs.forEach((btn)=>{
+        if(this.config.formBtnConfigs && this.config.formBtnConfigs.length > 0) {
+            this.config.formBtnConfigs.forEach((btn)=>{
                 let options = require('../../../views/content/' + btn.btnConfig.component).default;
                 let a = Vue.extend(options);
                 new a({router: this.$router, store: this.$store, propsData: {parentData: this.formData}, parent: this}).$mount('#btnFrom-' + btn.btnId);

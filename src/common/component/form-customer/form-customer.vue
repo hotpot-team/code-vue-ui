@@ -91,7 +91,7 @@
         <div class="config">
             <Button class="config-btn" type="info" @click="save">保存配置</Button>
             <Button class="config-btn" @click="preview">预览表单</Button>
-            <Button class="config-btn" type="success" @click="buttonShow = true">自定义按钮</Button>
+            <Button v-if="!noBtn" class="config-btn" type="success" @click="buttonShow = true">自定义按钮</Button>
         </div>
 
         <div class="config-table">
@@ -208,8 +208,8 @@
                 this.pathmag = Object.assign({}, this.pathmag, this.config.pathmag);
             }
 
-            if (this.config && this.config._buttonConfigs) {
-                this.buttonConfigs = JSON.parse(JSON.stringify(this.config._buttonConfigs));
+            if (this.config && this.config.formBtnConfigs) {
+                this.buttonConfigs = JSON.parse(JSON.stringify(this.config.formBtnConfigs));
             }
 
             //载入属性配置
@@ -263,10 +263,10 @@
                         formConfigData[p.name] = p;
                     }
                 });
-                return {'formConfigData': formConfigData, '_buttonConfigs' : this.buttonConfigs};
+                return {'formConfigData': formConfigData, 'formBtnConfigs' : this.buttonConfigs};
             }
         },
-        props: ['config', 'schemaData', 'configMenuName', 'menuId'],
+        props: ['config', 'schemaData', 'configMenuName', 'menuId', 'noBtn'],
         components: {
             'my-table': MyTable,
             'form-check': FormCheck,
@@ -305,7 +305,7 @@
                 });
                 this.$emit('saveConfig', {
                     formConfigData : formConfigData,
-                    _buttonConfigs: this.showConfig._buttonConfigs,
+                    formBtnConfigs: this.showConfig.formBtnConfigs,
                     pathmag: {
                         create: this.pathmag.create,
                         detail: this.pathmag.detail,
@@ -326,13 +326,13 @@
             },
             //保存自定义按钮
             saveBtnConfig(){
-                this.showConfig._buttonConfigs = JSON.parse(JSON.stringify(this.buttonConfigs));
-                this.config._buttonConfigs = JSON.parse(JSON.stringify(this.buttonConfigs));
+                this.showConfig.formBtnConfigs = JSON.parse(JSON.stringify(this.buttonConfigs));
+                this.config.formBtnConfigs = JSON.parse(JSON.stringify(this.buttonConfigs));
                 this.buttonShow = false;
             },
             cancelBtnConfig(){
-                if (this.config && this.config._buttonConfigs) {
-                    this.buttonConfigs = JSON.parse(JSON.stringify(this.config._buttonConfigs));
+                if (this.config && this.config.formBtnConfigs) {
+                    this.buttonConfigs = JSON.parse(JSON.stringify(this.config.formBtnConfigs));
                 } else {
                     this.buttonConfigs = [];
                 }
