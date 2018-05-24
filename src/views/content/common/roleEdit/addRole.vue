@@ -131,8 +131,10 @@
                 });
             },
             menuCheck(node, isChecked){
+                console.log(this.$refs['elTree'].getNode(node.id));
                 if (isChecked.checkedKeys.indexOf(node.id) > -1) {
                     this.parentCheck(node);
+                    this.childCheck(node.children);
                 }
                 if (isChecked.checkedKeys.indexOf(node.id) < 0 &&  node.children instanceof Array) {
                     this.cancelChecked(node.children);
@@ -142,6 +144,14 @@
                 if (this.nodeMap[node.parentId]) {
                     this.$refs.elTree.setChecked(node.parentId, true);
                     this.parentCheck(this.nodeMap[node.parentId]);
+                }
+            },
+            childCheck(childList){
+                if (childList && childList.length > 0) {
+                    for (let i = 0; i < childList.length; i++) {
+                        this.$refs.elTree.setChecked(childList[i].id, true);
+                        this.childCheck(childList[i].children);
+                    }
                 }
             },
             cancelChecked(list) {
