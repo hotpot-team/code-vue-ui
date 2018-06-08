@@ -9,7 +9,6 @@ import 'iview/dist/styles/iview.css';
 import 'element-ui/lib/theme-chalk/index.css';
 import store from './store';
 import loginInit from './login';
-import PersonInput from './common/component/person-seletion/person-input.vue';
 import RoleButton from './common/component/role-button/role-button.vue';
 import VCharts from 'v-charts';
 
@@ -68,9 +67,7 @@ router.beforeEach((to, from, next) => {
     Util.title(to.meta.title);
     //判断token
     store.commit('CREATE_BREAD_CRUMB', to);
-    if ( to.name !== 'login' ){
-        store.dispatch('updateDict');
-    }
+    store.dispatch('updateDict');
     next();
 });
 
@@ -87,7 +84,7 @@ Vue.use(Tree);
 Vue.use(Loading);
 Vue.use(VCharts);
 
-Vue.component('PersonInput',PersonInput);
+Vue.component('PersonInput',Util.personInput);
 Vue.component('RoleButton', RoleButton);
 Vue.component('draggable', vuedraggable);
 

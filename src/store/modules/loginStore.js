@@ -57,7 +57,7 @@ const actions = {
             commit(CHANGELOGININFO, info);
         }).catch(function() {});
     },
-    clearLogin({commit, state}){
+    clearLogin({commit}){
         commit(types.CLEAR_LOGIN);
     }
 };

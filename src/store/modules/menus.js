@@ -127,9 +127,7 @@ const mutations = {
         });
     },
     [types.CLEAR_MENU](state){
-        state.currentMenu = {
-            id: ''
-        };
+        state.currentMenu = {};
         state.menus = [];
         state.breadCrumbList = [];
         state.titleBread = [];

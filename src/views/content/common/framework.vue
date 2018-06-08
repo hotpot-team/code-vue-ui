@@ -25,7 +25,7 @@
             this.configMenuId = this.configMenuId?this.configMenuId: this.menuId;
             this.$store.dispatch('getConfig', this.uiVersion).then(()=>{
 
-                this.config = this.uiConfigData[this.configMenuId];
+                this.config = this.uiConfigData[this.configMenuId].tabConfigData;
                 let menu = this.getMenuById(this.configMenuId);
                 if (menu.children.length > 0) {
                     menu.children.forEach((p)=>{
@@ -86,7 +86,7 @@
             configMenuId: function(val, oldVal){
                 this.config = null;
                 this.$nextTick(()=>{
-                    this.config = this.uiConfigData[val];
+                    this.config = this.uiConfigData[val].tabConfigData;
                 });
             }
         }

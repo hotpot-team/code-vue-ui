@@ -46,7 +46,7 @@
             .config-title{
                 font-size: 14px;
                 text-align: center;
-                margin:16px 0;
+                margin:0 0 16px;
             }
         }
     }

@@ -1,25 +1,27 @@
-function transformToArrayFormat(menus){
-    if (!menus) return [];
+function transformToArrayFormat(treeObj, childKey){
+    childKey = childKey || 'children';
+    if (!treeObj) return [];
     let  r = [];
-    if (Object.prototype.toString.apply(menus) === '[object Array]') {
-        for (let i=0, l=menus.length; i<l; i++) {
-            r.push(menus[i]);
-            if (menus[i].children)
-                r = r.concat(transformToArrayFormat(menus[i].children));
+    if (Object.prototype.toString.apply(treeObj) === '[object Array]') {
+        for (let i=0, l=treeObj.length; i<l; i++) {
+            r.push(treeObj[i]);
+            if (treeObj[i][childKey])
+                r = r.concat(transformToArrayFormat(treeObj[i][childKey]));
         }
     } else {
-        r.push(menus);
-        if (menus.children)
-            r = r.concat(transformToArrayFormat(menus.children));
+        r.push(treeObj);
+        if (treeObj[childKey])
+            r = r.concat(transformToArrayFormat(treeObj[childKey]));
     }
     return r;
 }
 
-function transformToTreeFormat(array){
+function transformToTreeFormat(array, config){
+    config = Object.assign({}, config);
     let i,l,
-        key = 'id',
-        parentKey = 'parentId',
-        childKey = 'children';
+        key = config.key || 'id',
+        parentKey = config.parentId || 'parentId',
+        childKey = config.childKey || 'children';
 
     if (array instanceof Array) {
         let r = [];

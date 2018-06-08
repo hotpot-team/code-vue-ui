@@ -133,7 +133,7 @@
                 this.tableColumns = [];
                 this.tableData = [];
                 // 获取字典
-                let code = window.localStorage.dictstroage && JSON.parse(window.localStorage.dictstroage) || [];
+                let code = this.$store.getters.dictstroage;
                 // 构建查询表单
                 if (config.tabConfigData.searchForm) {
                     this.searchForm = Object.values(config.tabConfigData.searchForm).sort((a, b) => {

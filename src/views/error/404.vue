@@ -14,7 +14,7 @@
 </template>
 
 <script>
-    import Util from '../../libs/util'
+    import Util from '../../libs/util';
     export default {
         name: 'Error404',
         methods: {
@@ -32,9 +32,9 @@
                             if (config.component === 'common/restShow.vue' || config.component === 'common/expertTable.vue' || config.component === 'common/framework.vue') {
                                 query = {
                                     menuId: arr[i].id
-                                }
+                                };
                             }
-                            path ={path: '/main' + config.path, query: query}
+                            path ={path: '/main' + config.path, query: query};
                             break;
                         }
                     }

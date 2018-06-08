@@ -31,7 +31,7 @@
 <script>
     import { mapState, mapMutations, mapGetters } from 'vuex';
     import VueRouter from 'vue-router';
-    import Util from '../../libs/util';
+    import Util from '../../libs/util'
     export default {
         data(){
             return {
@@ -74,7 +74,7 @@
                         });
                     }).catch(function (e) {
                         window.localStorage.removeItem('loginInfo');
-                        window.location.href = Util.indexUrl;
+                        window.location.href = "/";
                     });
                 } else if (name === 'info') {
                     this.$router.push({path: '/main/p/setting'})

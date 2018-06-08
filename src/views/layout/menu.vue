@@ -41,6 +41,8 @@
                 title: Util.appName
             }
         },
+        created(){
+        },
         computed: {
             ...mapGetters([
                 'currentMenu',

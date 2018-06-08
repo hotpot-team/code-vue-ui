@@ -1,19 +1,19 @@
 <template>
     <Tabs value="name1" v-if="(schemaData && schemaData.tableName) || (childSchemaData && childSchemaData.tableName)">
         <TabPane label="表格配置" name="name1" v-if="!relationType">
-            <table-config :config="config" :schemaData="schemaData" :menuId="menuId" :configMenuName="configMenuName" @saveConfig="saveConfig" @addRelationTab="addRelationTab"></table-config>
+            <table-config :config="config" :schemaData="schemaData" :menuId="menuId" :configMenuName="configMenuName" @saveConfig="saveConfig" @addRelationTab="addRelationTab" :showType="showType"></table-config>
         </TabPane>
         <TabPane label="表单配置" name="name2" v-if="!relationType">
             <form-config :config="config" :schemaData="schemaData" :menuId="menuId" :configMenuName="configMenuName" @saveConfig="saveConfig" @addRelationTab="addRelationTab"></form-config>
         </TabPane>
         <TabPane label="表格配置" name="name1" v-if="relationType && relationType == 'one_to_many'">
-            <table-config :config="config" :schemaData="childSchemaData" :menuId="menuId" :configMenuName="configMenuName" @saveConfig="saveChildConfig"></table-config>
+            <table-config :config="config" :schemaData="childSchemaData" :menuId="menuId" :configMenuName="configMenuName" @saveConfig="saveChildConfig" :noBtn="true"></table-config>
         </TabPane>
         <TabPane label="表单配置" name="name2" v-if="relationType && relationType == 'one_to_many'">
-            <form-config :config="config" :schemaData="childSchemaData" :menuId="menuId" :configMenuName="configMenuName" @saveConfig="saveChildConfig"></form-config>
+            <form-config :config="config" :schemaData="childSchemaData" :menuId="menuId" :configMenuName="configMenuName" @saveConfig="saveChildConfig" :noBtn="true"></form-config>
         </TabPane>
         <TabPane label="表单配置" name="name1" v-if="relationType && relationType == 'one_to_one'">
-            <form-config :config="config" :schemaData="childSchemaData" :menuId="menuId" :configMenuName="configMenuName" @saveConfig="saveChildConfig"></form-config>
+            <form-config :config="config" :schemaData="childSchemaData" :menuId="menuId" :configMenuName="configMenuName" @saveConfig="saveChildConfig" :noBtn="true"></form-config>
         </TabPane>
     </Tabs>
 </template>
@@ -36,7 +36,7 @@
                 });
             }
         },
-        props: ['config', 'schema', 'configMenuName', 'childSchemaData', 'relationType', 'menuId'],
+        props: ['config', 'schema', 'configMenuName', 'childSchemaData', 'relationType', 'menuId','showType'],
         components: {
             'table-config': TableConfig,
             'form-config': FormConfig

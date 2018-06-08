@@ -55,7 +55,7 @@
                 this.$http.put('/security/password', {
                     hotpotUser: this.userChangeInfo,
                     newPassword: this.userChangeInfo.newPassword
-                }).then((res)=>{
+                }).then(()=>{
                     this.$Message.info('修改成功');
                 });
             }

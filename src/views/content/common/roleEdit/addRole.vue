@@ -17,7 +17,7 @@
                                 <Icon type="trash-a"></Icon>
                                 删除
                             </Button>
-                            <person-input type="info" :org="false" @on-selection-data="addPerson">
+                            <person-input type="info" :org="false" :team="false" @on-selection-data="addPerson">
                                 <Icon type="plus-round"></Icon>
                                 添加
                             </person-input>
@@ -32,7 +32,7 @@
                                 <Icon type="trash-a"></Icon>
                                 删除
                             </Button>
-                            <person-input type="info" :person="false" @on-selection-data="addOrg">
+                            <person-input type="info" :person="false" :team="false" @on-selection-data="addOrg">
                                 <Icon type="plus-round"></Icon>
                                 添加
                             </person-input>
@@ -45,9 +45,9 @@
     </div>
 </template>
 <script>
-    import Util from '../../../../libs/util';
+    //import Util from '../../../../libs/util';
     import TreeUtil from '../../../../treeUtil';
-    import Axios from 'axios';
+    //import Axios from 'axios';
     export default {
         data() {
             return {
@@ -99,14 +99,13 @@
             this.$http.get('/roleMag/' + this.$route.query.roleId + '/functions').then((res)=>{
                 let arryFunc = res.data.map((item)=>{
                     if (item.enabled === 'Y')
-                        _this.checkKeys.push(item.id)
-
+                        _this.checkKeys.push(item.id);
                     _this.nodeMap[item.id] = item;
                     return {
                         label: item.functionName,
                         id: item.id,
                         parentId: item.parentId
-                    }
+                    };
                 });
                 this.menuTree = TreeUtil.transformToTreeFormat(arryFunc);
             });
@@ -130,32 +129,42 @@
                     this.orgData = res.data;
                 });
             },
+            //复选框点击监听
             menuCheck(node, isChecked){
-                console.log(this.$refs['elTree'].getNode(node.id));
+                // 如果勾选
                 if (isChecked.checkedKeys.indexOf(node.id) > -1) {
+                    // 勾选父节点
                     this.parentCheck(node);
+                    // 勾选子节点
                     this.childCheck(node.children);
                 }
+                // 取消勾选
                 if (isChecked.checkedKeys.indexOf(node.id) < 0 &&  node.children instanceof Array) {
+                    // 取消所有子节点勾选
                     this.cancelChecked(node.children);
                 }
             },
             parentCheck(node){
                 if (this.nodeMap[node.parentId]) {
+                    // 父节点勾选
                     this.$refs.elTree.setChecked(node.parentId, true);
+                    // 递归父节点
                     this.parentCheck(this.nodeMap[node.parentId]);
                 }
             },
             childCheck(childList){
+                // 遍历所有子节点
                 if (childList && childList.length > 0) {
                     for (let i = 0; i < childList.length; i++) {
                         this.$refs.elTree.setChecked(childList[i].id, true);
+                        // 递归子节点
                         this.childCheck(childList[i].children);
                     }
                 }
             },
             cancelChecked(list) {
                 for (let i = 0; i < list.length; i++) {
+                    // 子节点取消选中
                     this.$refs.elTree.setChecked(list[i].id, false);
                     if (list[i].children instanceof Array && list[i].children.length > 0) {
                         this.cancelChecked(list[i].children);
@@ -165,15 +174,15 @@
             addPerson(data){
                 let map = new Map();
                 this.personData.forEach((item)=>{
-                    map.set(item.hotpotUser.id, item)
+                    map.set(item.hotpotUser.id, item);
                 });
                 let arr = [];
                 data.personList.forEach((item)=>{
                     if (!map.has(item.hotpotUser.id)) {
-                        arr.push(item.hotpotUser.id)
+                        arr.push(item.hotpotUser.id);
                     }
                 });
-                this.$http.put('/roleMag/'+this.$route.query.roleId + '/partys',arr).then((res)=>{
+                this.$http.put('/roleMag/'+this.$route.query.roleId + '/partys/0',arr).then((res)=>{
                     if (res.status === 200) {
                         this.userTableInit();
                         this.$Message.success('添加成功!');
@@ -203,15 +212,15 @@
             addOrg(data){
                 let map = new Map();
                 this.orgData.forEach((item)=>{
-                    map.set(item.id, item)
+                    map.set(item.id, item);
                 });
                 let arr = [];
                 data.orgList.forEach((item)=>{
                     if (!map.has(item.id)) {
-                        arr.push(item.id)
+                        arr.push(item.id);
                     }
                 });
-                this.$http.put('/roleMag/'+this.$route.query.roleId + '/partys',arr).then((res)=>{
+                this.$http.put('/roleMag/'+this.$route.query.roleId + '/partys/1',arr).then((res)=>{
                     if (res.status === 200) {
                         this.orgTableInit();
                         this.$Message.success('添加成功!');

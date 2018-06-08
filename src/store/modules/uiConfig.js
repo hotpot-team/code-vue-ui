@@ -32,7 +32,18 @@ const actions = {
                 let body = response.data;
                 // 如果配置信息不为空则更新配置信息和版本号
                 if (body.uimap && body.uimap.actualObj) {
-                    commit(types.UPDATE_UI_CONFIG, {data: body.uimap.actualObj, version: body.uimap.version});
+                    let data = {};
+                    for (let id in body.uimap.actualObj) {
+                        data[id] = {};
+                        for (let key in body.uimap.actualObj[id]) {
+                            if (Util.serializable.indexOf(key) > -1) {
+                                data[id][key] = JSON.parse(body.uimap.actualObj[id][key]);
+                            } else {
+                                data[id][key] = body.uimap.actualObj[id][key];
+                            }
+                        }
+                    }
+                    commit(types.UPDATE_UI_CONFIG, {data: data, version: body.uimap.version});
                 }
                 resolve();
             }).catch(function(e) {
@@ -41,24 +52,6 @@ const actions = {
             });
         });
     },
-    // 获取配置信息
-    fetchConfig({ commit, state }, {version, successCallback, processData}) {
-        Util.ajax.get('/api/ui/uiconfigs', {params: {version: version}}).then((response) => {
-            let body = response.data;
-            // 如果配置信息不为空则更新配置信息和版本号
-            if (body.uimap && body.uimap.actualObj) {
-                commit(types.UPDATE_UI_CONFIG, {data: body.uimap.actualObj, version: body.uimap.version});
-            }
-            // 如果定义了成功回调函数则触发回调函数
-            if (successCallback !== undefined) {
-                successCallback(state.uiConfigData, processData);
-            }
-        }).catch(function(e) {
-            // 错误提示
-            processData.$Message.error('数据获取失败!');
-        });
-
-    },
     saveConfig({commit, state}, data)  {
         let uiconfig = {data: data};
         let version = state.uiVersion;
@@ -66,7 +59,7 @@ const actions = {
             Util.ajax.post('/api/ui/uiconfigs/save', uiconfig).then((response) => {
                 // 如果返回值为成功则触发更新配置信息操作
                 if (response.data.statusCode === '0') {
-                    dispatch('fetchConfig', {version: version});
+                    dispatch('getConfig', {version: version});
                 }
                 resolve();
             }).catch(function(e) {

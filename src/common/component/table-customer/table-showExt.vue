@@ -24,7 +24,7 @@
 </style>
 <template>
     <div class="table-ext-show">
-        <Form ref="searchValidate" :model="formParam" inline>
+        <Form ref="searchValidate" :model="formParam" inline @submit.native.prevent>
             <FormItem v-if="searchForm.length > 0" v-for="(col, index) in searchForm" :key="index" :label="col.title || col.name" :prop="col.name">
                 <div v-if="col.searchModel == 'RANGE'">
                     <div v-if="col.format == 'date-time'">
@@ -41,7 +41,7 @@
                         <Option v-for="opt in dictList[col.name]" :value="opt.value" :key="opt.value">{{ opt.name }}</Option>
                     </Select>
                     <DatePicker v-else-if="col.format == 'date-time'" type="datetime" :format="col.pattern" v-model="formParam[col.name]"></DatePicker>
-                    <person-input style="min-width: 187px" v-else-if="col.personInput && col.personInput.length > 0" :single="col.personInput.indexOf('single') > -1" :person="col.personInput.indexOf('person') > -1" :org="col.personInput.indexOf('org') > -1" v-model="formParam[col.name]"></person-input>
+                    <person-input style="min-width: 187px" v-else-if="col.personInput && col.personInput.length > 0" :single="col.personInput.indexOf('single') > -1" :person="col.personInput.indexOf('person') > -1" :org="col.personInput.indexOf('org') > -1" :team="col.personInput.indexOf('team') > -1" v-model="formParam[col.name]"></person-input>
                     <Input v-else type="text" v-model="formParam[col.name]" style="min-width: 187px"/>
                 </div>
             </FormItem>
@@ -79,7 +79,7 @@
                     </Button>
                 </Upload>
             </FormItem>
-            <FormItem v-if="config.tabConfigData.buttonConfigs && config.tabConfigData.buttonConfigs.length>0" v-for="(btn, index) in config.tabConfigData.buttonConfigs" :key="btn.btnId">
+            <FormItem v-if="config.tableBtnConfigs && config.tableBtnConfigs.length>0" v-for="(btn, index) in config.tableBtnConfigs" :key="btn.btnId">
                 <div :id="'btnFrom-'+btn.btnId"></div>
             </FormItem>
         </Form>
@@ -168,9 +168,9 @@
         },
         created() {
             //表名
-            this.tableName = this.config.tableMappingName.replace(/_(\w)/g, ($0,$1) => $1.toUpperCase());
+            this.tableName = this.config.tableMappingName.toLowerCase().replace(/_(\w)/g, ($0,$1) => $1.toUpperCase());
             // 获取字典
-            let code = window.localStorage.dictstroage && JSON.parse(window.localStorage.dictstroage) || [];
+            let code = this.$store.getters.dictstroage;
             // 构建查询表单
             if (this.config.tabConfigData.searchForm) {
                 this.searchForm = Object.values(this.config.tabConfigData.searchForm).sort((a, b) => {
@@ -336,8 +336,8 @@
                         });
                     }
                 }
-                if (this.config.tabConfigData.rowButtonConfigs) {
-                    this.config.tabConfigData.rowButtonConfigs.forEach((btn)=>{
+                if (this.config.tableRowBtnConfigs) {
+                    this.config.tableRowBtnConfigs.forEach((btn)=>{
                         otherAction.push({
                             text: btn.btnName,
                             config: btn.btnConfig,
@@ -482,7 +482,6 @@
                         this.$Message.info('已取消');
                     }
                 });
-
             },
             clearSearchForm() {
                 this.$refs['searchValidate'].resetFields();
@@ -725,8 +724,8 @@
         },
         mounted(){
             let _this = this;
-            if(this.config.tabConfigData.buttonConfigs && this.config.tabConfigData.buttonConfigs.length > 0) {
-                this.config.tabConfigData.buttonConfigs.forEach((btn)=>{
+            if(this.config.tableBtnConfigs && this.config.tableBtnConfigs.length > 0) {
+                this.config.tableBtnConfigs.forEach((btn)=>{
                     let options = require('../../../views/content/' + btn.btnConfig.component).default;
                     let a = Vue.extend(options);
                     let b = new a({

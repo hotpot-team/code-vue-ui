@@ -1,4 +1,4 @@
-import zh from 'iview/dist/locale/zh-CN';
+//import zh from 'iview/dist/locale/zh-CN';
 
 export default {
     methods: {

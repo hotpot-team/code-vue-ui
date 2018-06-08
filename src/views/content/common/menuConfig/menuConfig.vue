@@ -4,10 +4,7 @@
             <h3 slot="title">
                 目标列表
             </h3>
-            <a href="#" slot="extra" @click="newMenus">
-                <Icon type="ios-plus-empty"></Icon>
-                新增
-            </a>
+            <Button slot="extra" type="info" @click="newMenus" style=" position: absolute;right: 0px; top: -8px;">新增</Button>
             <Tree ref="treeHere" :data="menuTree" ></Tree>
         </Card>
         <Card dis-hover class="cardItem">
@@ -50,6 +47,10 @@
                         <Option value="common/restShow.vue">
                             <span>接口列表配置</span>
                             <span style="float:right;">common/restShow.vue</span>
+                        </Option>
+                        <Option value="common/treeShow.vue">
+                            <span>树形结构配置</span>
+                            <span style="float:right;">common/treeShow.vue</span>
                         </Option>
                         <Option value="common/expertTable.vue">
                             <span>高级查询配置</span>
@@ -383,11 +384,29 @@
                     title: '删除确认',
                     content: '<p>确认删除吗？</p>',
                     onOk: () => {
-                        this.$http.delete('/funcMag/func/'+ this.currentNodeForm.id).then((res) => {
-                            this.getMenuData();
-                            this.$Message.info('已删除');
-                        }).catch((err)=>{
-                            if(err.response) this.$Message.error(err.response.data.message);
+                        this.$store.dispatch('getConfig', this.$store.state.ui.uiVersion).then(() => {
+                            let uiConfig = this.$store.state.ui.uiConfigData;
+                            if (uiConfig[this.currentNodeForm.parentId]) {
+                                let btns = ['tableBtnConfigs', 'tableRowBtnConfigs', 'formBtnConfigs'];
+                                let config =  uiConfig[this.currentNodeForm.parentId];
+                                for (let i in btns) {
+                                    if (config[btns[i]] && JSON.stringify(config[btns[i]]).indexOf(this.currentNodeForm.id) > -1) {
+                                        this.$Message.error('在父页面中存在自定义按钮配置,不能删除！')
+                                        return;
+                                    }
+                                }
+                            }
+                            this.$http.delete('/funcMag/func/'+ this.currentNodeForm.id).then((res) => {
+                                this.getMenuData();
+                                let config = {
+                                    router: this.$router,
+                                    token: this.$store.loginStore.loginInfo.authToken
+                                };
+                                this.$store.commit('MENU_LIST', config);
+                                this.$Message.info('已删除');
+                            }).catch((err)=>{
+                                if(err.response) this.$Message.error(err.response.data.message);
+                            });
                         });
                     },
                     onCancel: () => {
@@ -403,7 +422,8 @@
                         query: {
                             menuId: this.currentNodeForm.id,
                             menuName: this.currentNodeForm.functionName,
-                            menuPath: this.currentNodeForm.url.url
+                            menuPath: this.currentNodeForm.url.url,
+                            showType: 'table'
                         }
                     });
                 } else if (this.currentNodeForm.url.component === 'common/framework.vue') {
@@ -414,13 +434,23 @@
                             menuName: this.currentNodeForm.functionName
                         }
                     });
-                } else {
+                } else if (this.currentNodeForm.url.component === 'common/expertTable.vue'){
                     this.$router.push({
                         path: '/main/menuConfig/tabConfig',
                         query: {
                             menuId: this.currentNodeForm.id,
                             menuName: this.currentNodeForm.functionName,
                             menuPath: this.currentNodeForm.url.url
+                        }
+                    });
+                } if (this.currentNodeForm.url.component === 'common/treeShow.vue') {
+                    this.$router.push({
+                        path: '/main/menuConfig/restConfig',
+                        query: {
+                            menuId: this.currentNodeForm.id,
+                            menuName: this.currentNodeForm.functionName,
+                            menuPath: this.currentNodeForm.url.url,
+                            showType: 'tree'
                         }
                     });
                 }
@@ -434,7 +464,7 @@
                 return this.currentNodeForm.url.type === 'iframe';
             },
             judgeUrlComponent: function () {
-                let reg = new RegExp(/\/restShow\.vue|\/expertTable\.vue/);
+                let reg = new RegExp(/\/restShow\.vue|\/expertTable\.vue|\/treeShow\.vue/);
                 if (this.currentNodeForm.url && this.currentNodeForm.url.component.search(reg) !== -1){
                     return true;
                 }
@@ -446,7 +476,7 @@
                 return this.currentNodeForm.image1Id;
             },
             judgeConf:function () {
-                let reg = new RegExp(/restShow\.vue|expertTable\.vue|framework\.vue/i);
+                let reg = new RegExp(/restShow\.vue|\/treeShow\.vue|expertTable\.vue|framework\.vue/i);
                 if (this.currentNodeForm.url && this.currentNodeForm.url.component.search(reg) !== -1){
                     return true;
                 }

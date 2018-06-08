@@ -59,11 +59,12 @@
             return {
                 hasChildren: false,
                 open: false,
-                Modals:false
+                Modals:false,
+                specialList:['common/restShow.vue', 'common/expertTable.vue', 'common/framework.vue', 'common/treeShow.vue']
             }
         },
         computed: {
-            ...mapGetters([
+             ...mapGetters([
                 'currentMenu'
             ]),
         },
@@ -77,13 +78,12 @@
                         }
                     });
                 }
-
                 this.menuOpen(this.node);
                 if (this.currentMenu && this.currentMenu.url && this.currentMenu.url !=='') {
                     let urlConfig = JSON.parse(this.currentMenu.url);
                     if (this.$route.path === '/main' || this.$route.path === '/main/') {
                         let query = {};
-                        if (urlConfig.component === 'common/restShow.vue' || urlConfig.component === 'common/expertTable.vue' || urlConfig.component === 'common/framework.vue') {
+                        if (this.specialList.indexOf(urlConfig.component) > -1) {
                             query = {
                                 menuId : this.currentMenu.id
                             }
@@ -110,7 +110,7 @@
                         });
                     } else {
                         let query = {};
-                        if (urlConfig.component === 'common/restShow.vue' || urlConfig.component === 'common/expertTable.vue' || urlConfig.component === 'common/framework.vue') {
+                        if (this.specialList.indexOf(urlConfig.component) > -1) {
                             query = {
                                 menuId : node.id
                             }
@@ -132,7 +132,7 @@
                         if (node.children[i].id === this.currentMenu.id) {
                             this.open= true;
                             break;
-                        } else if (node.children[i].children != null && node.children[i].children.length>0) {
+                        } else if (node.children[i].children && node.children[i].children.length>0) {
                             this.menuOpen(node.children[i]);
                         }
                     }

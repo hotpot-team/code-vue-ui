@@ -7,7 +7,7 @@
         },
         data() {
             return{
-            }
+            };
         },
         methods:{
             handleClick(){

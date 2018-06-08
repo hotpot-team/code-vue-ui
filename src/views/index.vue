@@ -131,8 +131,8 @@
                                 me.$router.push({path: decodeURIComponent(this.$route.query.redirect)});
                             } else
                                 me.$router.push({path:'/main'});
-                        }).catch(() => {
-                            me.$Message.info('登录失败')
+                        }).catch((e) => {
+                            me.$Message.info(e.response.data.errorMessage);
                         })
                     } else {
                         me.$Message.error('表单验证失败!');

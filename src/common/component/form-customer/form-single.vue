@@ -28,8 +28,7 @@ export default {
     methods: {
         handleSubmit() {
             this.$refs['childForm'].insertData().then((data) => {
-                if (data === 200) {
-                }
+                data==200;
             });
         },
         clearForm() {

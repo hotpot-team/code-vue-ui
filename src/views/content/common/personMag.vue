@@ -25,7 +25,7 @@
                   :current="searchParam.pageParms.pageIndex" @on-change="pageChange" @on-page-size-change="pageSizeChange"></Page>
         </div>
 
-        <Modal :title="modalStats.isAdding?'新增人员':'信息修改'" v-model="modalStats.isShowModal">
+        <Modal :title="modalStats.isAdding?'新增人员':'信息修改'" v-model="modalStats.isShowModal" :transfer="false">
             <Form ref="formValid" :model="modalStats.formData" :rules="modalFormRule">
                 <FormItem label="登录名" :label-width="100" prop="userName">
                     <Input style="width: 85%" v-model="modalStats.formData.userName"></Input>
@@ -128,21 +128,7 @@
                                             this.deletePerson(params.row);
                                         }
                                     }
-                                },'删除'),
-//                                h('Button',{
-//                                    props: {
-//                                        type: 'info',
-//                                        size: 'small'
-//                                    },
-//                                    style: {
-//                                        margin: '0 3px'
-//                                    },
-//                                    on: {
-//                                        click: () => {
-//                                            this.resetPasswd(params.row);
-//                                        }
-//                                    }
-//                                },'密码重置')
+                                },'删除')
                             ]);
                         }
                     }
@@ -178,28 +164,27 @@
             searchPerson() {
                 this.searchParam.collection.filters = [];
                 this.searchParam.collection.filters.push({
-                    field: "hotpotUser.name",
-                    operator: "LIKE",
+                    field: 'hotpotUser.name',
+                    operator: 'LIKE',
                     value: this.formParam.name
                 });
                 if (this.formParam.minDate && this.formParam.minDate !== ''){
                     this.searchParam.collection.filters.push({
-                        field: "hotpotUser.createdAt",
-                        operator: "GTE",
+                        field: 'hotpotUser.createdAt',
+                        operator: 'GTE',
                         value: this.formParam.minDate.dateFormat('yyyy-MM-dd hh:mm:ss')
                     });
                 }
                 if (this.formParam.maxDate && this.formParam.maxDate !== ''){
                     this.searchParam.collection.filters.push({
-                        field: "hotpotUser.createdAt",
-                        operator: "LTE",
+                        field: 'hotpotUser.createdAt',
+                        operator: 'LTE',
                         value: this.formParam.maxDate.dateFormat('yyyy-MM-dd hh:mm:ss')
                     });
                 }
                 this.$http.post('/security/users', this.searchParam).then((response) => {
                     this.personData = response.data.data;
                     this.searchParam.pageParms.totalElem = response.data.totalElements;
-//                    this.personTotal = response.data.totalElements;
                 });
             },
             search(){
@@ -235,7 +220,7 @@
                                 this.modalStats.isShowModal = false;
                             }).catch(()=>{
                                 this.$Message.error('操作失败');
-                            })
+                            });
                         }
                     } else {
                         this.$Message.error('表单不完整');

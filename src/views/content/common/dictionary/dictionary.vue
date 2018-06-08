@@ -30,7 +30,7 @@
             <Form ref="valueFormVal" :model="valueForm" :rules="valueRules" :label-width="80">
                 <FormItem label="value:" prop="value"><Input v-model="valueForm.value" style="width: 300px;"></Input></FormItem>
                 <FormItem label="name:" prop="name"><Input v-model="valueForm.name" style="width: 300px;"></Input></FormItem>
-                <FormItem label="sort:" prop="sort"><Input v-model="valueForm.sort" style="width: 300px;"></Input></FormItem>
+                <FormItem label="sort:" prop="sort"><Input v-model="valueForm.sort" style="width: 300px;" type="text" number></Input></FormItem>
             </Form>
             <div slot="footer">
                 <Button type="error" @click="valueModal = false">取消</Button>
@@ -40,12 +40,28 @@
     </div>
 </template>
 <script>
-    import util from '../../../../libs/util';
     export default {
         created: function() {
             this.getDictList();
         },
         data () {
+            const validatePort = (rule, value, callback) => {
+                if (!value && value!== 0) {
+                    return callback(new Error('sort不能为空！'));
+                }
+                // 模拟异步验证效果
+                setTimeout(() => {
+                    if (!Number.isInteger(value)) {
+                        callback(new Error('请输入自然数！'));
+                    } else {
+                        if (value < 0) {
+                            callback(new Error('sort大于等于0！'));
+                        } else {
+                            callback();
+                        }
+                    }
+                });
+            };
             return {
                 searchItem: {
                     code: '',
@@ -184,24 +200,22 @@
                 typeForm: {},
                 typeRules: {
                     code: [
-                        { required: true, message: 'code不能为空', trigger: 'blur' }
-                    ],
+                        {required: true, message: 'code不能为空', trigger: 'blur',},
+                        {pattern:/^[^\s]+$/,message: '不能输入空格', trigger: 'blur'}],
                     name: [
-                        { required: true, message: '描述不能为空', trigger: 'blur' },
-                    ]
+                        {required: true, message: '描述不能为空', trigger: 'blur' },
+                        {pattern:/^[^\s]+$/,message: '不能输入空格', trigger: 'blur'}]
                 },
                 valueForm: {},
                 valueRules: {
                     value: [
-                        { required: true, message: 'value不能为空', trigger: 'blur' }
-                    ],
+                        {required: true, message: 'value不能为空', trigger: 'blur' },
+                        {pattern:/^[^\s]+$/,message: '不能输入空格', trigger: 'blur'}],
                     name: [
-                        { required: true, message: 'name不能为空', trigger: 'blur' }
-                    ],
+                        {required: true, message: 'name不能为空', trigger: 'blur' },
+                        {pattern:/^[^\s]+$/,message: '不能输入空格', trigger: 'blur'}],
                     sort: [
-                        { required: true, type: 'number', message: 'sort不能为空', trigger: 'blur' },
-                        {pattern:/^\d*$/, message: '只能为数字', trigger: 'change'}
-                    ]
+                        {validator: validatePort, trigger: 'blur',required: true}]
                 },
             };
         },
@@ -287,6 +301,7 @@
                 this.typeForm = Object.assign({},row);
                 this.modify = 2;
                 this.typeModal = true;
+                this.handleReset('typeFormVal');
             },
             typeCommit(){
                 this.$refs['typeFormVal'].validate((valid) => {
@@ -295,8 +310,12 @@
                             this.$http.post('/api/dict/dict_type',{
                                 'code':this.typeForm.code,
                                 'name':this.typeForm.name
-                            }).then(()=>{
-                                this.$Message.success('成功新建type模型');
+                            }).then((res)=>{
+                                if(res.data.message !='操作成功'){
+                                    this.$Message.error('模型'+ res.data.message);
+                                }else {
+                                    this.$Message.success('成功新建type模型');
+                                }
                                 this.typeModal = false;
                                 this.search();
                             });
@@ -305,8 +324,12 @@
                                 'code': this.typeForm.code,
                                 'id': this.typeForm.id,
                                 'name': this.typeForm.name
-                            }).then(()=>{
-                                this.$Message.success('成功修改type模型');
+                            }).then((res)=>{
+                                if(res.data.message !='操作成功'){
+                                    this.$Message.error(res.data.message);
+                                }else {
+                                    this.$Message.success('成功修改type模型');
+                                }
                                 this.typeModal = false;
                                 this.search();
                             });
@@ -314,7 +337,6 @@
                     }
                 });
             },
-//            typeCancel () {this.typeModal = false;},
             typeDel (row) {
                 this.$http.delete('/api/dict/dict_type/'+row.id).then(()=>{
                     this.search();
@@ -337,6 +359,7 @@
                 this.valueForm = Object.assign({},row);
                 this.modify = 2;
                 this.valueModal = true;
+                this.handleReset('valueFormVal');
             },
             valueCommit() {
                 this.$refs['valueFormVal'].validate((valid) => {
@@ -374,7 +397,7 @@
             handleReset (name) {
                 this.$refs[name].resetFields();
             }
-        }
+        },
     };
 </script>
 <style lang="scss" scoped>

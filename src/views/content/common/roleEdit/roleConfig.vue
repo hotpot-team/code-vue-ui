@@ -65,7 +65,9 @@
                 },
                 roleModalForm:{},
                 rolerules: {
-                    roleName:{required: true,message: '角色名不能为空!'}
+                    roleName:[
+                        {required: true,message: '角色名不能为空!'},
+                        {pattern:/^[^\s]+$/,message: '不能输入空格', trigger: 'blur'}]
                 },
                 //角色表格
                 roleCol: [
@@ -161,12 +163,6 @@
         },
         methods: {
             getRoleData() {
-//                let req = JSON.parse(JSON.stringify(this.searchParam));
-//                req.collection.filters.push({
-//                    field: 'roleName',
-//                    operator: 'LIKE',
-//                    value: this.roleSearchItem.roleName
-//                });
                 this.searchParam.collection.filters = [];
                 this.searchParam.collection.filters.push({
                     field: 'roleName',
@@ -179,7 +175,7 @@
                         operator: 'GTE',
                         value: this.roleSearchItem.beginAt.dateFormat('yyyy-MM-dd hh:mm:ss')
                     });
-                };
+                }
                 if (this.roleSearchItem.endAt){
                     this.searchParam.collection.filters.push({
                         field: 'createdAt',
@@ -253,7 +249,7 @@
             deleteCfm(id) {
                 if (id) {
                     this.$Modal.confirm({
-                        title: '角色:' + this.rolename,
+                        title: '角色名:' + this.rolename,
                         content: '<p>确认删除该角色？</p>',
                         onOk: () => {
                             this.deleteRole(id);

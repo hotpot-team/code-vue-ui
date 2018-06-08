@@ -107,10 +107,11 @@
         created() {
             this.$store.dispatch('getConfig', this.uiVersion).then(() => {
                 this.config = this.uiConfigData[this.configMenuId];
-                if (this.config) {
+                if (this.config && this.config.tableMappingName === 'framework') {
+                    let fconfig = this.config.tabConfigData;
                     this.panelList.forEach((p, index)=>{
-                        if (this.config.type === p.type){
-                            this.panelList.splice(index, 1, JSON.parse(JSON.stringify(this.config)));
+                        if (fconfig.type === p.type){
+                            this.panelList.splice(index, 1, JSON.parse(JSON.stringify(fconfig)));
                         }
                     });
                 }
@@ -134,8 +135,12 @@
             save(){
                 this.panelList.forEach((p)=>{
                     if (p.checked) {
-                        this.uiConfigData[this.configMenuId] = p;
-                        this.$store.dispatch('saveConfig',  JSON.stringify(this.uiConfigData).replace(/"([^"]*)"/g, "'$1'")).then(() => {
+                        let data = {
+                            id: this.configMenuId,
+                            tabConfigData:  JSON.stringify(p),
+                            tableMappingName: 'framework'
+                        };
+                        this.$store.dispatch('saveConfig',  JSON.stringify(data)).then(() => {
                             this.$Message.success('数据保存成功!');
                         });
                     }

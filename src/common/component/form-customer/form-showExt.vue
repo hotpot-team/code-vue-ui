@@ -2,15 +2,21 @@
 
 </style>
 <template>
-    <div>
+    <div style="margin-right: 48px">
         <Form ref="formValidate" :model="formData" :rules="ruleValidate" :label-width="100" @submit.native.prevent>
             <FormItem v-for="(item, index) in formItemList" v-if="item.isShow || item.required" :key="index" :label="item.title || item.name" :prop="item.name">
-                <Select v-if="item.dictName && dictList[item.name]" v-model="formData[item.name]" >
+                <RadioGroup v-if="item.isRadio" v-model="formData[item.name]">
+                    <Radio v-for="(opt, index) in dictList[item.name]" :label="opt.value" :key="index">{{opt.name}}</Radio>
+                </RadioGroup>
+                <Select v-else-if="item.dictName && dictList[item.name]" v-model="formData[item.name]" >
                     <Option v-for="opt in dictList[item.name]" :value="opt.value" :key="opt.value + ''">{{ opt.name }}</Option>
                 </Select>
+                <Select v-else-if="treeConfig && item.name === treeConfig.parentId" v-model="formData[item.name]">
+                    <Option v-for="opt in treeData" :value="opt[treeConfig.value]" :key="opt[treeConfig.value]">{{opt[treeConfig.label]}}</Option>
+                </Select>
                 <DatePicker style="width: 100%" v-else-if="item.format == 'date-time'" type="date" v-model="formData[item.name]" :format="item.pattern"></DatePicker>
-                <person-input v-else-if="item.personInput && item.personInput.length > 0"  :single="item.personInput.indexOf('single') > -1" :person="item.personInput.indexOf('person') > -1" :org="item.personInput.indexOf('org') > -1" v-model="formData[item.name]"></person-input>
-                <Input v-else v-model="formData[item.name]" ></Input>
+                <person-input v-else-if="item.personInput && item.personInput.length > 0"  :single="item.personInput.indexOf('single') > -1" :person="item.personInput.indexOf('person') > -1" :org="item.personInput.indexOf('org') > -1" :team="item.personInput.indexOf('team') > -1" v-model="formData[item.name]"></person-input>
+                <Input v-else v-model="formData[item.name]" :type="item.isTextArea?'textarea':'text'"></Input>
             </FormItem>
 
             <FormItem v-if="config.formBtnConfigs && config.formBtnConfigs.length>0" v-for="(btn, index) in config.formBtnConfigs" :key="btn.btnId">
@@ -31,7 +37,17 @@ export default {
             tableName: '' //对应的表名
         };
     },
-    props: ['config'],
+    props: {
+        config: {
+            type: Object
+        },
+        treeData: {
+            type: Array
+        },
+        treeConfig: {
+            type: Object
+        }
+    },
     created(){
         const validateRequired = (rule, value, callback) => {
             if (value == '') {
@@ -48,7 +64,7 @@ export default {
         this.formItemList = Object.values(this.config.formConfigData).sort((a, b) => {
             return a.sortIndex - b.sortIndex;
         });
-        let code = window.localStorage.dictstroage && JSON.parse(window.localStorage.dictstroage) || [];
+        let code = this.$store.getters.dictstroage;
         this.formItemList.forEach((obj) => {
             // 验证规则
             if (obj.isValidate && obj.ruleValidate) {

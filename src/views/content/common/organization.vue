@@ -145,7 +145,7 @@
                 formRule: {
                     orgName: { required: true, message: '组织名称不能为空', trigger: 'blur' },
                     sort: [
-                        {type: "number", required: true, message: '排序不能为空', trigger: 'blur' },
+                        {type: 'number', required: true, message: '排序不能为空', trigger: 'blur' },
                         { type: 'number', message: '必须为数字', trigger: 'change' }
                     ]
                 },
@@ -199,7 +199,7 @@
                         if (this.stats.isNewOrg) {
                             let req = Object.assign({},this.modalForm);
                             req.orgFullName = this.modalForm.orgFullName || this.modalForm.orgName;
-                            this.$http.post('/orgMag/org', req).then((res)=> {
+                            this.$http.post('/orgMag/org', req).then(()=> {
                                 this.getOrgData();
                                 this.$Message.success('新增成功');
                             });
@@ -210,7 +210,7 @@
                                 sort: this.modalForm.sort,
                                 description: this.modalForm.description
                             };
-                            this.$http.put('/orgMag/org/' + this.modalForm.id, req).then((res)=> {
+                            this.$http.put('/orgMag/org/' + this.modalForm.id, req).then(()=> {
                                 this.getOrgData();
                                 this.$Message.success('修改成功');
                             });
@@ -223,7 +223,7 @@
 
             orgDelete(row) {
                 if (row.children && row.children.length){
-                    this.$Message.error('未删除子组织')
+                    this.$Message.error('未删除子组织');
                 } else {
                     this.$Modal.confirm({
                         title: '删除确认',

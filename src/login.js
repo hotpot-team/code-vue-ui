@@ -1,4 +1,3 @@
-import iView from 'iview';
 import stores from './store';
 import Util from './libs/util';
 
@@ -47,10 +46,12 @@ loginInit.login = function(router){
         if(err.response && err.response.status == 401){
             stores.commit('CHANGELOGININFO',{});
             window.localStorage.removeItem('loginInfo');
-            router.replace({
-                path: Util.indexUrl,
-                query: {redirect: encodeURIComponent(router.currentRoute.fullPath)}
-            });
+            if (router.currentRoute.fullPath !== Util.indexUrl) {
+                router.replace({
+                    path: Util.indexUrl,
+                    query: {redirect: encodeURIComponent(router.currentRoute.fullPath)}
+                });
+            }
         }
         return Promise.reject(err);
     });

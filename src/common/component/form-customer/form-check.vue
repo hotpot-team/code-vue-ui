@@ -14,6 +14,14 @@
                 <Radio label="是" v-model="column.readOnly" :true-value="true" :false-value="false" :disabled="column._disabled"></Radio>
                 <Radio label="否" v-model="column.readOnly" :true-value="false" :false-value="true" :disabled="column._disabled"></Radio>
             </FormItem>
+            <FormItem label="单选框形式" prop="title" v-if="column.dictName">
+                <Radio label="是" v-model="column.isRadio" :true-value="true" :false-value="false" :disabled="column._disabled"></Radio>
+                <Radio label="否" v-model="column.isRadio" :true-value="false" :false-value="true" :disabled="column._disabled"></Radio>
+            </FormItem>
+            <FormItem label="文本框形式" prop="title" v-if="!column.dictName && !column.format">
+                <Radio label="是" v-model="column.isTextArea" :true-value="true" :false-value="false" :disabled="column._disabled"></Radio>
+                <Radio label="否" v-model="column.isTextArea" :true-value="false" :false-value="true" :disabled="column._disabled"></Radio>
+            </FormItem>
             <FormItem label="日期格式" prop="title" v-if="column.format">
                 <Input v-model="column.pattern"></Input>
             </FormItem>
@@ -29,23 +37,36 @@
             <FormItem label="最小值" prop="title" v-if="(column.type === 'integer' || column.type === 'string') && !column.format">
                 <Input v-model="column.ruleValidate.min.min"></Input>
             </FormItem>
-            <FormItem label="人员选择器" prop="title">
+            <FormItem label="人员选择器" prop="title" v-if="!column.dictName && !column.format && !column.isTextArea">
                 <CheckboxGroup v-model="column.personInput">
                     <Checkbox label="single"><span>单选</span></Checkbox>
                     <Checkbox label="person"><span>人员</span></Checkbox>
                     <Checkbox label="org"><span>组织</span></Checkbox>
+                    <Checkbox v-if="showTeam" label="team"><span>群组</span></Checkbox>
                 </CheckboxGroup>
             </FormItem>
         </Form>
     </div>
 </template>
 <script>
+    import Util from '../../../libs/util';
     export default {
         data() {
             return {
+                showTeam: false
             };
         },
         created() {
+            if (Util.personInput.props.team) {
+                this.showTeam = true;
+            }
+            if (!this.column.dictName && !this.column.format && !this.column.isTextArea) {
+                this.$set(this.column, 'isTextArea', false)
+//                this.column.isTextArea = false;
+            } else if (this.column.dictName && !this.column.isRadio) {
+                this.$set(this.column, 'isRadio', false)
+//                this.column.isRadio = false
+            }
             this.initRule();
         },
         props: ['column'],
@@ -98,7 +119,7 @@
                 }
             },
             isPersonInput(column){
-                if (column.personInput && column.personInput.length === 0) {
+                if ((column.personInput && column.personInput.length === 0) || column.isTextArea ) {
                     delete column['personInput'];
                 }
             }
