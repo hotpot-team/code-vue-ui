@@ -4,8 +4,8 @@
     }
 </style>
 <template>
-    <div>
-        <form-show :config="config" ref="childForm"></form-show>
+    <div class="form-single">
+        <form-show :config="config" ref="childForm" :singleClass="singleClass"></form-show>
         <div class="footer">
             <Button type="ghost" @click="clearForm">清空</Button>
             <Button type="primary" @click="handleSubmit">提交</Button>
@@ -22,8 +22,25 @@ export default {
     components: {
         'form-show': FormShow
     },
-    props: ['config'],
+    props: {
+        config: {
+            type: Object
+        },
+        singleClass:{
+            type: String,
+            default: 'single'
+        }
+    },
     created(){
+    },
+    mounted(){
+        if (this.config.pathmag.detail && this.config.pathmag.detail.uri) {
+            let url = this.config.pathmag.detail.uri;
+            let arrayParam = url.match(new RegExp('(\\w+?)(?=})', 'g'));
+            if (!arrayParam || arrayParam.length === 0) {
+                this.$refs['childForm'].getData({});
+            }
+        }
     },
     methods: {
         handleSubmit() {

@@ -1,7 +1,7 @@
 <style lang="scss" scoped>
     .url-header {
-        display: flex;
-        flex-direction: row;
+        @include compatibleFlex
+        @include flex-direction(row);
         margin-bottom: 16px;
 
         label {
@@ -33,8 +33,8 @@
     }
 
     .config-table{
-        display: flex;
-        flex-direction: row;
+        @include compatibleFlex;
+        @include flex-direction(row);
         .table-style{
             margin-right: 16px;
             width: calc(100% - 380px);
@@ -52,8 +52,8 @@
     }
 
     .btn-config{
-        display: flex;
-        justify-content: space-between;
+        @include compatibleFlex;
+        @include flex-justify;
         margin-top: 16px;
         .btn-config-item{
             margin-right: 16px;
@@ -100,7 +100,7 @@
             </div>
             <div class="config-style">
                 <div class="config-title">表单配置</div>
-                <form-check ref="formColumnValidate" :column="formData[currentIndex]"></form-check>
+                <form-check ref="formColumnValidate" :column="formData[currentIndex]" :columnList="formData"></form-check>
             </div>
         </div>
         <Modal v-model="isPreModal" :title="configMenuName" @on-ok="isPreModal = false" width="600" ok-text="确认" cancel-text="" :transfer="true">

@@ -5,6 +5,7 @@
     import Row from './row.vue';
     import Column from './column.vue';
     import Tab from './tab.vue';
+    import Drag from './Drag.vue';
     export default {
         props: ['config','childrenConfig', 'titles'],
         data() {
@@ -14,7 +15,8 @@
         components: {
             'row': Row,
             'column': Column,
-            'tab': Tab
+            'tab': Tab,
+            'drag':Drag,
         },
         methods: {},
         created: function () {

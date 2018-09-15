@@ -2,8 +2,8 @@ import Vue from 'vue';
 import iView from 'iview';
 import VueRouter from 'vue-router';
 import Routers from './routers/router';
-import Vuex from 'vuex';
 import Util from './libs/util';
+import Vuex from 'vuex';
 import App from './app.vue';
 import 'iview/dist/styles/iview.css';
 import 'element-ui/lib/theme-chalk/index.css';
@@ -11,6 +11,11 @@ import store from './store';
 import loginInit from './login';
 import RoleButton from './common/component/role-button/role-button.vue';
 import VCharts from 'v-charts';
+
+import 'bpmn-js/dist/assets/diagram-js.css';
+import 'bpmn-js/dist/assets/bpmn-font/css/bpmn.css';
+import 'bpmn-js/dist/assets/bpmn-font/css/bpmn-embedded.css';
+import 'bpmn-js-properties-panel/dist/assets/bpmn-js-properties-panel.css';
 
 import { Tree } from 'element-ui';
 import { Loading } from 'element-ui';
@@ -21,6 +26,7 @@ const RouterConfig = {
     routes: Routers
 };
 Vue.prototype.$http = Util.ajax;
+
 Date.prototype.dateFormat = function (fmt) {
     let o = {
         'M+': this.getMonth() + 1, //月份
@@ -88,11 +94,11 @@ Vue.component('PersonInput',Util.personInput);
 Vue.component('RoleButton', RoleButton);
 Vue.component('draggable', vuedraggable);
 
-new Vue({
+let v = new Vue({
     el: '#app',
     router: router,
     store: store,
     render: h => h(App)
 });
 
-export default router;
+export default v;

@@ -1,7 +1,7 @@
 <style scoped lang="scss">
     .affix{
-        display: flex;
-        justify-content: space-between;
+        @include compatibleFlex;
+        @include flex-justify;
         padding: 14px 16px;
         border-bottom: 1px solid #e9eaec;
         box-sizing: border-box;

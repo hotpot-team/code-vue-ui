@@ -1,6 +1,6 @@
 <style lang="scss" scoped>
     .main{
-        display: flex;
+        @include compatibleFlex;
         height: 100%;
         width: 100%;
         overflow: hidden;

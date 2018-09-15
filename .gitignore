@@ -11,5 +11,3 @@ src/config/env.js
 npm-debug.log
 package-lock.json
 npm-debug.log
-prod
-prod/*

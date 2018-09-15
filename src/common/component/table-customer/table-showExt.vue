@@ -111,6 +111,7 @@
     import RoleButton from '../role-button/role-button.vue';
     import Util from '../../../libs/util';
     import Vue from 'vue';
+    import fileServer from '../../../libs/fileServer';
     export default {
         data(){
             return{
@@ -206,20 +207,39 @@
                                 dictValues = result[0].value;
                             }
                         }
+                        let _this = this;
                         this.tableColumns.push({
                             title: obj.title ? obj.title : obj.name,
-                            key: obj.name,
+//                            key: obj.name,
                             sortable: obj.isOrder,
-                            render: obj.dictName? (h, params) => { //如果是字典，获取对应的值
-                                if (dictValues) {
+                            render: (h, params) => {
+                                let content = h('span',params.row[obj.name]);
+                                if (!params.row[obj.name]) { //先判断是否有值，没有值就为空字符串
+                                    return ''
+                                } else if (obj.dictName && dictValues){ //如果是字典，获取对应的值
                                     for (let i = 0; i < dictValues.length; i++) {
                                         if (dictValues[i].value == params.row[obj.name]) {
-                                            return h('span',dictValues[i].name);
+                                            content = h('span',dictValues[i].name);
                                         }
                                     }
+                                } else if (obj.fileId && obj.fileId !== '') {
+                                    content = h('a',{
+                                        on:{
+                                            click(){
+                                                fileServer.downloadFile(params.row[obj.fileId], params.row[obj.name]);
+                                            }
+                                        }
+                                    }, [params.row[obj.name]])
+                                } else if (obj.renderFormat) {
+                                    if (obj.format === 'date-time') {
+                                        content = h('div',{}, new Date(params.row[obj.name]).dateFormat(obj.renderFormat));
+                                    } else {
+                                        let result = obj.renderFormat.replace('${d}', 'params.row[obj.name]');
+                                        content = h('div',{}, eval(result));
+                                    }
                                 }
-                                return h('span',params.row[obj.name]);
-                            } : null
+                                return content
+                            }
                         });
                     }
                 });
@@ -524,7 +544,7 @@
                 let excelTitle = this.config.tabConfigData.importExcelConfig.excelHeader != undefined &&
                   this.config.tabConfigData.importExcelConfig.excelHeader.length > 0 ?
                   this.config.tabConfigData.importExcelConfig.excelHeader : this.config.tableMappingName;
-                let url = Util.url + '/' + Util.baseUrl + '/api/common/excel/template/download';
+                let url = Util.url + Util.baseUrl + '/api/common/excel/template/download';
                 let fileName = excelTitle + '_导入模板.xlsx';
                 let reqData = {
                     'excelTitle': [],
@@ -587,7 +607,7 @@
                 let excelTitle = this.config.tabConfigData.importExcelConfig.excelHeader != undefined &&
                   this.config.tabConfigData.importExcelConfig.excelHeader.length > 0 ?
                   this.config.tabConfigData.importExcelConfig.excelHeader : this.config.tableMappingName;
-                let url = Util.url + '/'+ Util.baseUrl + '/api/common/excel/export/download';
+                let url = Util.url + Util.baseUrl + '/api/common/excel/export/download';
                 let fileName = excelTitle + '_数据导出.xlsx';
                 let searchp = [];
                 if (this.initParam) {
@@ -618,6 +638,9 @@
                 };
                 let i = 0;
                 for (let key in this.config.tabConfigData.tableColumns) {
+                    if (this.config.tabConfigData.tableColumns[key].type === 'array' || this.config.tabConfigData.tableColumns[key].type === 'object') {
+                        continue;
+                    }
                     let excelTitleObj = {};
                     excelTitleObj.fieldName = this.config.tabConfigData.tableColumns[key].mappingName;
                     excelTitleObj.fieldDESC = this.config.tabConfigData.tableColumns[key].description || this.config.tabConfigData.tableColumns[key].mappingName;

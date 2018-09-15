@@ -14,7 +14,7 @@
 <template>
     <div>
         <div v-if="formFlag" class="form-single">
-            <form-single :config="config"></form-single>
+            <form-single :config="config" :singleClass="singleClass"></form-single>
         </div>
         <div v-else>
             <div v-if="!relation">
@@ -48,6 +48,10 @@
         props:{
             config: {
                 type: Object
+            },
+            singleClass:{
+                type: String,
+                default: 'single'
             }
         },
         created() {

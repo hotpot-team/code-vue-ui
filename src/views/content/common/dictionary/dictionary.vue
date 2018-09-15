@@ -402,7 +402,7 @@
 </script>
 <style lang="scss" scoped>
     .dicTitlebox {
-        display: flex;
+        @include compatibleFlex;
         margin-top: 16px;
     }
     .dicTitleitem {

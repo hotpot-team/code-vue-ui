@@ -5,12 +5,13 @@
         border-radius: 2px;
         border: none;
         min-height: 800px;
+        position: relative;
         .content-title{
             font-size: 16px;
             padding: 16px;
             border-bottom: 1px solid #e9eaec;
-            justify-content: space-between;
-            display: flex;
+            @include flex-justify;
+            @include compatibleFlex;
             span{
                 line-height: 32px;
             }

@@ -1,0 +1,87 @@
+variables:
+    IMG_NAME: 10.64.250.16/titanotp/hotpot-ui:${CI_COMMIT_REF_SLUG}.${CI_PIPELINE_ID}
+    
+cache:
+  paths:
+    - node_modules
+    - prod
+    - test
+
+stages:
+  - build
+  - ship
+  - deploy
+
+.sonarqube:
+  tags: 
+    - gradle_v4
+  stage: analysis
+  image: 10.64.250.16/changan/gitlab-sonar-scanner:2.1.0
+  variables:
+    SONAR_URL: http://10.64.26.49:9000
+    SONAR_ANALYSIS_MODE: publish
+  script:
+  - gitlab-sonar-scanner
+  
+build:test:
+  tags:
+    - gradle_v4
+  image: 10.64.250.16/changan/node:dind3
+  stage: build
+  script:
+  - rm -rf ./prod ./test
+  - export http_proxy=http://172.16.1.188:3126/
+  - export https_proxy=http://172.16.1.188:3126/
+  - npm install --registry=https://registry.npm.taobao.org --disturl=https://npm.taobao.org/dist --sass-binary-site=http://npm.taobao.org/mirrors/node-sass
+  - npm run test
+  only:
+  - dev
+  
+
+build:prod:
+  tags:
+    - gradle_v4
+  image: 10.64.250.16/changan/node:dind3
+  stage: build
+  script:
+  - rm -rf ./prod ./test
+  - export http_proxy=http://172.16.1.188:3126/
+  - export https_proxy=http://172.16.1.188:3126/
+  - npm install --registry=https://registry.npm.taobao.org --disturl=https://npm.taobao.org/dist --sass-binary-site=http://npm.taobao.org/mirrors/node-sassl
+  - npm run build
+  only:
+  - tags
+  
+ship:test:
+  tags:
+    - gradle_v4
+  stage: ship
+  image: 10.64.250.16/changan/node:dind3
+  script:
+  - docker build -f Dockerfile --build-arg path=./test -t ${IMG_NAME} .
+  - docker login 10.64.250.16 -u admin -p ${harborPW}
+  - docker push ${IMG_NAME}
+  - docker rmi ${IMG_NAME}
+  only:
+  - dev
+  
+ship:prod:
+  tags:
+    - gradle_v4
+  stage: ship
+  image: 10.64.250.16/changan/node:dind3
+  script:
+  - docker build -f Dockerfile -t ${IMG_NAME} .
+  - docker login 10.64.250.16 -u admin -p ${harborPW}
+  - docker push ${IMG_NAME}
+  - docker rmi ${IMG_NAME}
+  only:
+  - tags
+  
+.deploy:
+  tags:
+    - shell
+  stage: deploy
+  script:
+  - echo ${IMG_NAME}
+  when: manual

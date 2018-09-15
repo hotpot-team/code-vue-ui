@@ -15,8 +15,8 @@
             }
         }
         .config-table{
-            display: flex;
-            flex-direction: row;
+            @include compatibleFlex;
+            @include flex-direction(row);
             .table-style{
                 margin-right: 16px;
                 width: calc(100% - 380px);
@@ -38,6 +38,15 @@
         cursor: default;
         opacity: 1;
     }
+
+    .btn-config{
+        @include compatibleFlex;
+        @include flex-justify;
+        margin-top: 16px;
+        .btn-config-item{
+            margin-right: 16px;
+        }
+    }
 </style>
 <template>
     <div class="expert-config">
@@ -46,7 +55,7 @@
             <FormItem label="选择关联关系">
                 <Select v-model="currentUri" style="width: 800px" @on-change="pathChnage">
                     <Option :value="value.uri" v-for="(value, key) in jsonSchema.crudmappings" :key="key" :label="value.uri">
-                        <div style="display: flex;justify-content: space-between">
+                        <div style="@include compatibleFlex;@include flex-justify;">
                             <span>{{value.uri}}</span>
                             <span>{{value.description}}</span>
                         </div>
@@ -58,10 +67,12 @@
             <Button class="config-btn" type="info" @click="save">保存配置</Button>
             <Button class="config-btn" @click="modalShow = true">预览表格</Button>
             <Checkbox v-model="isPage">分页</Checkbox>
+            <Button  class="config-btn" type="success" style="margin-left: 16px" @click="buttonShow = true">按钮</Button>
+            <Button  class="config-btn" type="warning" @click="buttonRowShow = true">行按钮</Button>
         </div>
         <div class="config-table">
             <div class="table-style">
-                <my-table ref="configMyTable" :columns="columns" :data="data" @reloadTable="reloadTable" :highlight-row="true" @on-row-click="rowClick" :height="650"></my-table>
+                <my-table ref="configMyTable" :columns="columns" :data="data" @reloadTable="reloadTable" :highlight-row="true" @on-row-click="rowClick"></my-table>
             </div>
             <div class="config-style">
                 <div class="config-title">查询配置</div>
@@ -71,11 +82,11 @@
                     </FormItem>
                     <FormItem label="Radio">
                         <RadioGroup v-model="data[currentIndex].searchModel" on-change="radioChange">
-                            <Radio label="EQ" :disabled="data[currentIndex].type==='object'">
-                                <span>EQ(等于)</span>
-                            </Radio>
                             <Radio label="LIKE" :disabled="data[currentIndex].type==='object'">
                                 <span>LIKE(模糊匹配)</span>
+                            </Radio>
+                            <Radio label="EQ" :disabled="data[currentIndex].type==='object'">
+                                <span>EQ(等于)</span>
                             </Radio>
                             <Radio label="GTE" :disabled="data[currentIndex].type==='object'">
                                 <span>GTE(大于等于)</span>
@@ -97,12 +108,36 @@
                 <expert-table :showConfig="showConfig" ref="showForm" :show="true"></expert-table>
             </div>
         </Modal>
+
+
+        <Modal v-model="buttonShow" title="自定义按钮" @on-ok="saveBtnConfig(false)" @on-cancel="cancelBtnConfig(false)" ok-text="确认" cancel-text="取消" :transfer="true">
+            <Button @click="addButton(false)">新增</Button>
+            <div v-for="(btn ,index) in buttonConfigs" :key="index" class="btn-config">
+                <Button :type="btn.btnType" class="btn-config-item">{{btn.btnName}}</Button>
+                <Select v-model="btn.btnId" class="btn-config-item" @on-change="btnConfigChange($event, index, false)">
+                    <Option v-for="(item, index) in buttons" :value="item.id" :label="item.functionName" :key="index"></Option>
+                </Select>
+                <Button class="btn-config-item" @click="buttonConfigs.splice(index, 1)">删除</Button>
+            </div>
+        </Modal>
+
+        <Modal v-model="buttonRowShow" title="自定义行按钮" @on-ok="saveBtnConfig(true)" @on-cancel="cancelBtnConfig(true)" ok-text="确认" cancel-text="取消" :transfer="true">
+            <Button @click="addButton(true)">新增</Button>
+            <div v-for="(btn ,index) in rowButtonConfigs" :key="index" class="btn-config">
+                <Button :type="btn.btnType" class="btn-config-item">{{btn.btnName}}</Button>
+                <Select v-model="btn.btnId" class="btn-config-item" @on-change="btnConfigChange($event, index, true)">
+                    <Option v-for="(item, index) in buttons" :value="item.id" :label="item.functionName" :key="index"></Option>
+                </Select>
+                <Button class="btn-config-item" @click="rowButtonConfigs.splice(index, 1)">删除</Button>
+            </div>
+        </Modal>
     </div>
 </template>
 <script>
     import {mapGetters} from 'vuex';
     import MyTable from '../../../../common/component/table/table.vue';
-    import ExpertTable from '../expertTable.vue'
+    import ExpertTable from '../expertTable.vue';
+    import Util from '../../../../libs/util';
     export default {
         data(){
             return {
@@ -186,7 +221,12 @@
                             });
                         }
                     }],
-                data:[]
+                data:[],
+                buttonShow: false,
+                buttonRowShow: false,
+                buttons: [],
+                buttonConfigs:[],
+                rowButtonConfigs:[]
             }
         },
         computed: {
@@ -196,26 +236,32 @@
             ]),
             showConfig:function () {
                 let tabConfigData = Object.assign({}, {isPage: this.isPage});
+
+                let tableBtnConfigs = JSON.parse(JSON.stringify(this.buttonConfigs));
+                let tableRowBtnConfigs = JSON.parse(JSON.stringify(this.rowButtonConfigs));
+
                 this.data.forEach((p, index) => {
                     if (p.isShow) {
                         p.sortIndex = index;
                         if (!tabConfigData.tableColumns) {
                             tabConfigData.tableColumns = {};
                         }
-                        tabConfigData.tableColumns[p.name] = p;
+                        tabConfigData.tableColumns[p.tableName + '.' + p.name] = p;
                     }
                     if (p.isSearch) {
                         if (!tabConfigData.searchForm) {
                             tabConfigData.searchForm = {};
                         }
-                        tabConfigData.searchForm[p.name] = p;
+                        tabConfigData.searchForm[p.tableName + '.' + p.name] = p;
                     }
                 });
                 let config = {
                     configName: this.configMenuName,
                     id: this.configMenuId,
                     pathmag: this.pathmag,
-                    tabConfigData: tabConfigData
+                    tabConfigData: tabConfigData,
+                    tableBtnConfigs: tableBtnConfigs,
+                    tableRowBtnConfigs: tableRowBtnConfigs
                 };
                 return config;
             }
@@ -241,6 +287,11 @@
                 this.$set(this.pathmag, 'page', JSON.parse(JSON.stringify(relations[0])));
                 this.currentUri = relations[0].uri;
 
+                // 所有可自定义按钮
+                if (this.$store.getters.getMenuById(this.configMenuId) && this.$store.getters.getMenuById(this.configMenuId).children) {
+                    this.buttons = this.$store.getters.getMenuById(this.configMenuId).children;
+                }
+
                 if (this.config) {
                     relations.forEach((p)=>{
                         if (this.config.pathmag.page.uri === p.uri) {
@@ -249,6 +300,13 @@
                         }
                     });
                     this.isPage = this.config.tabConfigData.isPage;
+
+                    if (this.config.tableBtnConfigs) {
+                        this.buttonConfigs = JSON.parse(JSON.stringify(this.config.tableBtnConfigs));
+                    }
+                    if (this.config.tableRowBtnConfigs) {
+                        this.rowButtonConfigs = JSON.parse(JSON.stringify(this.config.tableRowBtnConfigs));
+                    }
                 }
 
                 //属性初始化
@@ -284,9 +342,10 @@
                         columsData[i].description = columsData[i].name;
                     }
                     this.$set(columsData[i], 'title', columsData[i].description);
-                    this.$set(columsData[i], 'searchModel', 'EQ');
-                    if (this.config && this.config.tabConfigData && this.config.tabConfigData.tableColumns[columsData[i].name] && this.config.tabConfigData.tableColumns[columsData[i].name].tableName === columsData[i].tableName) {
-                        columsData[i] = Object.assign({},columsData[i], this.config.tabConfigData.tableColumns[columsData[i].name]);
+                    this.$set(columsData[i], 'searchModel', 'LIKE');
+                    let pro = columsData[i].tableName + '.' + columsData[i].name;
+                    if (this.config && this.config.tabConfigData && this.config.tabConfigData.tableColumns[pro] && this.config.tabConfigData.tableColumns[pro].tableName === columsData[i].tableName) {
+                        columsData[i] = Object.assign({},columsData[i], this.config.tabConfigData.tableColumns[pro]);
                         this.$set(columsData[i], '_highlight', false);
                         sortData.push(columsData[i]);
                     } else {
@@ -317,11 +376,17 @@
                 });
             },
             save(){
-                this.uiConfigData[this.configMenuId] = this.showConfig;
-                this.$store.dispatch('saveConfig',  JSON.stringify(this.uiConfigData).replace(/"([^"]*)"/g, "'$1'")).then(() => {
+                let tempData = {};
+                for (let key in this.showConfig) {
+                    if (Util.serializable.indexOf(key) > -1) {
+                        tempData[key] = JSON.stringify(this.showConfig[key]);
+                    } else {
+                        tempData[key] = this.showConfig[key];
+                    }
+                }
+                this.$store.dispatch('saveConfig',  JSON.stringify(tempData)).then(() => {
                     this.$Message.success('数据保存成功!');
                 });
-
             },
             reloadTable(oldIndex, newIndex) {
                 let temp = this.data[oldIndex];
@@ -338,8 +403,69 @@
                 });
                 this.data[index]._highlight = true;
                 this.currentIndex = index;
-            }
+            },
+            addButton(row){
+                if (this.buttons.length < 1) {
+                    this.$Message.warning('请先在菜单管理中添加按钮！');
+                    return;
+                }
 
+                if (row) {
+                    this.rowButtonConfigs.push({
+                        btnName: this.buttons[0].functionName,
+                        btnConfig: JSON.parse(this.buttons[0].url),
+                        btnType: 'ghost',
+                        btnId: this.buttons[0].id
+                    });
+                } else {
+                    this.buttonConfigs.push({
+                        btnName: this.buttons[0].functionName,
+                        btnConfig: JSON.parse(this.buttons[0].url),
+                        btnType: 'ghost',
+                        btnId: this.buttons[0].id
+                    });
+                }
+            },
+            //保存自定义按钮
+            saveBtnConfig(row){
+                if (row) {
+                    this.showConfig.tableRowBtnConfigs = JSON.parse(JSON.stringify(this.rowButtonConfigs));
+                    this.buttonRowShow = false;
+                } else {
+                    this.showConfig.tableBtnConfigs = JSON.parse(JSON.stringify(this.buttonConfigs));
+                    this.buttonShow = false;
+                }
+            },
+            cancelBtnConfig(row){
+                if (row) {
+                    if (this.config.tableRowBtnConfigs) {
+                        this.rowButtonConfigs = JSON.parse(JSON.stringify(this.config.tableRowBtnConfigs));
+                    } else {
+                        this.rowButtonConfigs = [];
+                    }
+                    this.buttonRowShow = false;
+                } else {
+                    if (this.config.tableBtnConfigs) {
+                        this.buttonConfigs = JSON.parse(JSON.stringify(this.config.tableBtnConfigs));
+                    } else {
+                        this.buttonConfigs = [];
+                    }
+                    this.buttonShow = false;
+                }
+            },
+            btnConfigChange(id, index, row){
+                this.buttons.forEach((b)=>{
+                    if (b.id === id) {
+                        if (row) {
+                            this.rowButtonConfigs[index].btnName = b.functionName;
+                            this.rowButtonConfigs[index].btnConfig = JSON.parse(b.url);
+                        } else {
+                            this.buttonConfigs[index].btnName = b.functionName;
+                            this.buttonConfigs[index].btnConfig = JSON.parse(b.url);
+                        }
+                    }
+                });
+            }
         }
     }
 </script>

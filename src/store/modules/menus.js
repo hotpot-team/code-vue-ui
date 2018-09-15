@@ -98,7 +98,8 @@ const mutations = {
         Util.ajax.get('/security/functions/').then((response)=>{
             if (response.status == 200) {
                 if (response.data.length === 0) {
-                    router.push({path: Util.indexUrl, query: {error:'noRole'}});
+                    window.localStorage.removeItem('loginInfo');
+                    router.push({name: 'login', query: {error:'noRole'}});
                 }
                 let children = [];
                 state.menus = TreeUtil.transformToTreeFormat(response.data);

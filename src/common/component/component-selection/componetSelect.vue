@@ -10,6 +10,7 @@
     import RestFramework from '../restFramework.vue';
     import ExpertTable from '../../../views/content/common/expertTable.vue';
     import IFrame from '../../../views/content/common/iframe.vue';
+    import TreeFramework from '../treeFramework';
     export default {
         props: {
             configs: [String, Object],
@@ -23,7 +24,8 @@
         components: {
             'rest-framework': RestFramework,
             'expert-table':ExpertTable,
-            'i-frame': IFrame
+            'i-frame': IFrame,
+            'tree-framework': TreeFramework
         },
         methods: {},
         created: function () {
@@ -36,6 +38,8 @@
                     return 'rest-framework';
                 } else if (this.componetType === 3) {
                     return 'i-frame';
+                } else if (this.componetType === 4){
+                    return 'tree-framework';
                 } else {
                     return 'div';
                 }

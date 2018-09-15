@@ -3,9 +3,9 @@
         <Card dis-hover class="cardItem">
             <h3 slot="title">目标列表</h3>
             <div slot="extra" class="ext-btn-style">
-                <Button v-if="config.tabConfigData.isAdd" type="primary" @click="addForm">新 增</Button>
+                <Button v-if="config.tabConfigData.isAdd" type="info" @click="addForm">新 增</Button>
                 <Button v-if="config.tabConfigData.isModify" type="primary" @click="modifyForm">修 改</Button>
-                <Button v-if="config.tabConfigData.isDelete" type="primary" @click="deleteForm">删 除</Button>
+                <Button v-if="config.tabConfigData.isDelete" type="error" @click="deleteForm">删 除</Button>
             </div>
 
             <el-tree :data="treeData" :highlight-current="true" default-expand-all node-key="id" ref="elTree" :expand-on-click-node="false" @current-change="currentChange">
@@ -14,8 +14,6 @@
                 </div>
             </el-tree>
         </Card>
-
-
 
         <Modal v-model="modelShow" :title="modelTitle" @on-ok="" width="600" ok-text="" @on-cancel="" :transfer="true">
             <form-show :config="config" ref="childForm" v-if="modelShow" :treeData="arrayData" :treeConfig="treeConfig"></form-show>
@@ -212,11 +210,12 @@
 <style scoped lang="scss">
     .tree-ext-show{
         .ext-btn-style {
-            position: absolute;
+            /*position: absolute;
             right: 0;
-            top: -8px;
-            display: flex;
-            flex-flow: row nowrap;
+            top: -8px;*/
+            margin-top: -8px;
+            @include compatibleFlex;
+            @include flex-justify('flex-start');
             button {
                 margin-right: 4px;
             }

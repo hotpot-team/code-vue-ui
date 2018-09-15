@@ -1,8 +1,9 @@
 <style lang="scss" scoped>
     .panel-column{
-        display: flex;
-        flex-direction: column;
+        @include compatibleFlex;
+        @include flex-direction(column);
         flex-wrap: wrap;
+        -ms-flex-wrap: wrap;
     }
 </style>
 <template>

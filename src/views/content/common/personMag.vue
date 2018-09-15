@@ -128,7 +128,21 @@
                                             this.deletePerson(params.row);
                                         }
                                     }
-                                },'删除')
+                                },'删除'),
+//                                h('Button',{
+//                                    props: {
+//                                        type: 'info',
+//                                        size: 'small'
+//                                    },
+//                                    style: {
+//                                        margin: '0 3px'
+//                                    },
+//                                    on: {
+//                                        click: () => {
+//                                            this.resetPasswd(params.row);
+//                                        }
+//                                    }
+//                                },'密码重置')
                             ]);
                         }
                     }

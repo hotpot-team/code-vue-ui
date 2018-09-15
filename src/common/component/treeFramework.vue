@@ -3,12 +3,12 @@
         <div v-if="!relation">
             <tree-show-ext :config="config"></tree-show-ext>
         </div>
-        <div v-else class="tab-frame-work">
+        <div v-else class="tree-frame-flex">
             <tree-show-ext :config="config"  @oneToMany="openOneToMany" style="width: 30%"></tree-show-ext>
-            <div  style="width: 70%; margin-left: 32px">
+            <div style="width: 70%; margin-left: 32px">
                 <Tabs type="card" :value="actTab" v-if="otherConfigs.length > 0">
                     <TabPane v-for="(tabConfig, index) in otherConfigs" :key="index" :label="tabConfig.configName" :closable="false" :name="tabConfig.configName">
-                        <table-show-ext :config="tabConfig"></table-show-ext>
+                        <rest-frame :config="tabConfig" singleClass="normal"></rest-frame>
                     </TabPane>
                 </Tabs>
             </div>
@@ -16,8 +16,8 @@
     </div>
 </template>
 <script>
-    import TableShowExt from './table-customer/table-showExt.vue';
     import TreeShowExt from './tree-customer/tree-showExt';
+    import restFrame from './restFramework';
     export default {
         data(){
             return {
@@ -32,14 +32,14 @@
             }
         },
         components:{
-            TableShowExt,
+            restFrame,
             TreeShowExt
         },
         created(){
             if (this.config.tabConfigData && this.config.tabConfigData.tableColumns) {
                 let tableColumns = this.config.tabConfigData.tableColumns;
                 for (let col in tableColumns) {
-                    if (tableColumns[col].tableConfig && tableColumns[col].relationType === 'one_to_many') {
+                    if (tableColumns[col].tableConfig && tableColumns[col].relationType) {
                         this.relation = true;
                     }
                 }
@@ -55,16 +55,15 @@
                 });
                 this.$nextTick(()=>{
                     this.otherConfigs.push(config);
-                    this.actTab = config.configName;
+                    this.actTab = this.otherConfigs[0].configName;
                 });
             }
         }
     };
 </script>
-<style scoped lang="scss">
-    .tab-frame-work{
-        display: flex;
-        flex-direction: row;
-        width: 100%;
+<style lang="scss" scoped>
+    .tree-frame-flex{
+        @include compatibleFlex;
+        @include flex-direction(row);
     }
 </style>

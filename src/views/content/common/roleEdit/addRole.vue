@@ -232,10 +232,10 @@
 </script>
 <style lang="scss" scoped>
     .cardContainer {
-        display: flex;
+        @include compatibleFlex;
         flex-flow: row nowrap;
         padding: 16px;
-        justify-content: space-between;
+        @include flex-justify;
 
         .saveBtn{
             position: absolute;
@@ -250,9 +250,9 @@
         width: 69%;
     }
     .formButtons {
-        display: flex;
+        @include compatibleFlex;
         flex-flow: row nowrap;
-        justify-content: center;
+        @include flex-justify('center');
         button {
             margin: 0 6px;
         }
@@ -282,8 +282,8 @@
                 margin: 0;
             }
             .people-button {
-                display: flex;
-                flex-direction: row-reverse;
+                @include compatibleFlex;
+                @include flex-direction('row-reverse');
                 margin-bottom: 16px;
             }
             .tab-pane{

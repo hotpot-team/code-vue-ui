@@ -26,23 +26,23 @@
 <template>
     <div class="expert-table">
         <Form ref="searchValidate" :model="formParam" inline>
-            <Form-MItem v-if="searchForm.length > 0" v-for="(col, index) in searchForm" :key="index" :label="col.title || col.name" :prop="col.name" :labelTitle="col.tableName">
+            <Form-MItem v-if="searchForm.length > 0" v-for="(col, index) in searchForm" :key="index" :label="col.title || col.name" :prop="col.tableName + '.' + col.name" :labelTitle="col.tableName">
                 <div v-if="col.searchModel == 'RANGE'">
                     <div v-if="col.format == 'date-time'">
-                        <DatePicker type="datetime" :format="col.pattern" :ref="col.name + '-min'"></DatePicker>
-                        <DatePicker type="datetime" :format="col.pattern" :ref="col.name + '-max'"></DatePicker>
+                        <DatePicker type="datetime" :format="col.pattern" :ref="col.tableName + '-' + col.name + '-min'"></DatePicker>
+                        <DatePicker type="datetime" :format="col.pattern" :ref="col.tableName + '-' + col.name + '-max'"></DatePicker>
                     </div>
                     <div v-else>
-                        <Input type="text" :ref="col.name + '-min'" style="width: 45%"></Input>
-                        <Input type="text" :ref="col.name + '-max'"  style="width: 45%"></Input>
+                        <Input type="text" :ref="col.tableName + '-' + col.name + '-min'" style="width: 45%"></Input>
+                        <Input type="text" :ref="col.tableName + '-' + col.name + '-max'"  style="width: 45%"></Input>
                     </div>
                 </div>
                 <div v-else>
-                    <Select v-if="col.dictName && dictList[col.name]" v-model="formParam[col.name]" style="min-width: 187px">
-                        <Option v-for="opt in dictList[col.name]" :value="opt.value" :key="opt.value">{{ opt.name }}</Option>
+                    <Select v-if="col.dictName && dictList[col.tableName + '.' + col.name]" v-model="formParam[col.tableName][col.name]" style="min-width: 187px">
+                        <Option v-for="opt in dictList[col.tableName + '.' + col.name]" :value="opt.value" :key="opt.value">{{ opt.name }}</Option>
                     </Select>
-                    <DatePicker v-else-if="col.format == 'date-time'" type="datetime" :format="col.pattern" v-model="formParam[col.name]"></DatePicker>
-                    <Input v-else type="text" v-model="formParam[col.name]" style="min-width: 187px"></Input>
+                    <DatePicker v-else-if="col.format == 'date-time'" type="datetime" :format="col.pattern" v-model="formParam[col.tableName][col.name]"></DatePicker>
+                    <Input v-else type="text" v-model="formParam[col.tableName][col.name]" style="min-width: 187px"></Input>
                 </div>
             </Form-MItem>
             <FormItem v-if="searchForm.length > 0">
@@ -50,6 +50,9 @@
             </FormItem>
             <FormItem v-if="searchForm.length > 0">
                 <Button type="ghost" @click="clearSearchForm">清 空</Button>
+            </FormItem>
+            <FormItem v-if="config.tableBtnConfigs && config.tableBtnConfigs.length>0" v-for="(btn, index) in config.tableBtnConfigs" :key="btn.btnId">
+                <div :id="'btnFrom-'+btn.btnId"></div>
             </FormItem>
         </Form>
         <Table :columns="tableColumns" :data="tableData" @on-sort-change="tableSort"></Table>
@@ -60,7 +63,8 @@
 </template>
 <script type="text/ecmascript-6">
     import { mapState, mapGetters } from 'vuex';
-    import FormItemExt from '../../../common/component/form-item-ext/form-item.vue'
+    import FormItemExt from '../../../common/component/form-item-ext/form-item.vue';
+    import Vue from 'vue';
     export default {
         data() {
             return {
@@ -88,12 +92,18 @@
             if(this.showConfig) {
                 this.config = JSON.parse(JSON.stringify(this.showConfig));
                 this.initTable(this.config);
+                this.$nextTick(()=>{
+                    this.initTableBtn()
+                });
             } else {
                 this.configMenuId = this.configMenuId?this.configMenuId: this.menuId;
                 this.$store.dispatch('getConfig', this.uiVersion).then(()=>{
                     this.config = this.uiConfigData[this.configMenuId];
                     if (this.config) {
                         this.initTable(this.config);
+                        this.$nextTick(()=>{
+                            this.initTableBtn()
+                        });
                     } else {
                         this.$Message.warning('请去配置页面配置！');
                     }
@@ -140,14 +150,17 @@
                         return a.sortIndex - b.sortIndex;
                     });
                     this.searchForm.forEach((obj, index) => {
-                        this.$set(this.formParam, obj.name, '');
+                        if (!this.formParam[obj.tableName]) {
+                            this.$set(this.formParam, obj.tableName, {});
+                        }
+                        this.$set(this.formParam[obj.tableName], obj.name, '');
                         //获取对应字典
                         if (obj.dictName) {
                             let result = code.filter((item) => {
                                 return item.code === obj.dictName;
                             });
                             if (result.length > 0) {
-                                this.$set(this.dictList, obj.name, result[0].value);
+                                this.$set(this.dictList, obj.tableName + '.' + obj.name, result[0].value);
                             }
                         }
                     });
@@ -175,9 +188,9 @@
                                 name: obj.tableName + "." + obj.name,
                                 sortable: obj.isOrder,
                                 render: (h, params) => { //如果是字典，获取对应的值
-                                    if (obj.dictName && dictValues) {
+                                    if (obj.dictName && dictValues && params.row[obj.tableName]) {
                                         for (let i = 0; i < dictValues.length; i++) {
-                                            if (dictValues[i].value == params.row[obj.name]) {
+                                            if (dictValues[i].value == params.row[obj.tableName][obj.name]) {
                                                 return h('span',dictValues[i].name);
                                             }
                                         }
@@ -199,6 +212,7 @@
                 if (config.tabConfigData.isPage) {
                     this.searchParams.pageParms.pageSize = 10;
                 }
+                this.initAction();
                 //预览
                 if (this.show) {
                     this.initSearchParams();
@@ -231,32 +245,85 @@
                     this.searchParams.pageParms.pageIndex = 0;
             },
             editSearchParams(){
-                this.searchForm.forEach((obj, index) => {
-                    if (obj.searchModel === 'RANGE') {
-                        if (this.$refs[obj.name + '-min'] && this.$refs[obj.name + '-min'][0].currentValue) {
-                            this.searchParams.collection.filters.push({
-                                field: obj.tableName + '.' + obj.name,
-                                operator: 'GTE',
-                                value: this.editSearchValue(obj, this.$refs[obj.name + '-min'][0].currentValue)
-                            });
+                if (this.searchForm && Object.keys(this.searchForm).length > 0) {
+                    this.searchForm.forEach((obj, index) => {
+                        if (obj.searchModel === 'RANGE') {
+                            if (obj.format === 'date-time' && this.$refs[obj.tableName + '-' + obj.name + '-min'] && this.$refs[obj.tableName + '-' + obj.name + '-min'][0].internalValue && this.$refs[obj.tableName + '-' + obj.name + '-min'][0].internalValue[0]) {
+                                this.searchParams.collection.filters.push({
+                                    field: obj.tableName + '.' + obj.name,
+                                    operator: 'GTE',
+                                    value: this.editSearchValue(obj, this.$refs[obj.tableName + '-' + obj.name + '-min'][0].internalValue[0])
+                                });
+                            } else if (this.$refs[obj.tableName + '-' + obj.name + '-min'] && this.$refs[obj.tableName + '-' + obj.name + '-min'][0].currentValue){
+                                this.searchParams.collection.filters.push({
+                                    field: obj.tableName + '.' + obj.name,
+                                    operator: 'GTE',
+                                    value: this.editSearchValue(obj, this.$refs[obj.tableName + '-' + obj.name + '-min'][0].currentValue)
+                                });
+                            }
+                            if (obj.format === 'date-time' && this.$refs[obj.tableName + '-' + obj.name + '-max'] && this.$refs[obj.tableName + '-' + obj.name + '-max'][0].internalValue && this.$refs[obj.tableName + '-' + obj.name + '-max'][0].internalValue[0]) {
+                                this.searchParams.collection.filters.push({
+                                    field: obj.tableName + '.' + obj.name,
+                                    operator: 'LTE',
+                                    value: this.editSearchValue(obj, this.$refs[obj.tableName + '-' + obj.name + '-max'][0].internalValue[0])
+                                });
+                            } else if (this.$refs[obj.tableName + '-' + obj.name + '-max'] && this.$refs[obj.tableName + '-' + obj.name + '-max'][0].currentValue){
+                                this.searchParams.collection.filters.push({
+                                    field: obj.tableName + '.' + obj.name,
+                                    operator: 'LTE',
+                                    value: this.editSearchValue(obj, this.$refs[obj.tableName + '-' + obj.name + '-max'][0].currentValue)
+                                });
+                            }
+
+                        } else {
+                            if (this.formParam[obj.tableName][obj.name]) {
+                                this.searchParams.collection.filters.push({
+                                    field: obj.tableName + '.' + obj.name,
+                                    operator: obj.searchModel,
+                                    value: this.editSearchValue(obj, this.formParam[obj.tableName][obj.name])
+                                });
+                            }
                         }
-                        if (this.$refs[obj.name + '-max'] && this.$refs[obj.name + '-max'][0].currentValue) {
-                            this.searchParams.collection.filters.push({
-                                field: obj.tableName + '.' + obj.name,
-                                operator: 'LTE',
-                                value: this.editSearchValue(obj, this.$refs[obj.name + '-max'][0].currentValue)
-                            });
+                    });
+                }
+            },
+            // 构建操作
+            initAction(){
+                let otherAction = [];
+                if (this.config.tableRowBtnConfigs) {
+                    this.config.tableRowBtnConfigs.forEach((btn)=>{
+                        otherAction.push({
+                            text: btn.btnName,
+                            config: btn.btnConfig,
+                            type: btn.btnType,
+                            btnId: btn.btnId
+                        });
+                    });
+                }
+                if (otherAction.length > 0) {
+                    let control = {
+                        title: '操作', key: 'action', align: 'center', render: (h, params) => {
+                            return h('div',{}, otherAction.map(item => {
+                                let data = params.row;
+                                let options = require ('../' + item.config.component).default;
+                                let a = new Vue({
+                                    extends: options,
+                                    created(){
+                                        this.parentData = data;
+                                    }
+                                });
+                                let _this = this;
+                                let b = h(Vue.extend(a.$options), {on:{
+                                        refreshTable: function () {
+                                            _this.search();
+                                        }
+                                    }});
+                                return b;
+                            }));
                         }
-                    } else {
-                        if (this.formParam[obj.name]) {
-                            this.searchParams.collection.filters.push({
-                                field: obj.tableName + '.' + obj.name,
-                                operator: obj.searchModel,
-                                value: this.editSearchValue(obj, this.formParam[obj.name])
-                            });
-                        }
-                    }
-                });
+                    };
+                    this.tableColumns.push(control);
+                }
             },
             searchPost(params) {
                 this.$http.post(this.config.pathmag.page.uri, params).then((response) => {
@@ -275,6 +342,20 @@
             },
             clearSearchForm() {
                 this.$refs['searchValidate'].resetFields();
+                this.searchForm.forEach((obj) => {
+                    if (obj.searchModel === 'RANGE') {
+                        let arr = ['-min', '-max'];
+                        for (let i=0; i < arr.length; i++) {
+                            if (this.$refs[obj.tableName + '-' + obj.name + arr[i]]) {
+                                if (obj.format === 'date-time') {
+                                    this.$refs[obj.tableName + '-' + obj.name + arr[i]][0].internalValue = [];
+                                } else if ( this.$refs[obj.tableName + '-' + obj.name + arr[i]][0].currentValue){
+                                    this.$refs[obj.tableName + '-' + obj.name + arr[i]][0].currentValue = '';
+                                }
+                            }
+                        }
+                    }
+                });
             },
             editSearchValue(obj, value) {
                 if (obj.type === 'integer') {
@@ -284,6 +365,28 @@
                     value = value.dateFormat(obj.pattern);
                 }
                 return value;
+            },
+            initTableBtn(){
+                let _this = this;
+                if(this.config.tableBtnConfigs && this.config.tableBtnConfigs.length > 0) {
+                    this.config.tableBtnConfigs.forEach((btn)=>{
+                        let options = require('../' + btn.btnConfig.component).default;
+                        let a = Vue.extend(options);
+                        let b = new a({
+                            router: this.$router,
+                            store: this.$store,
+                            parent: this,
+                            computed: {
+                                parentData(){
+                                    return _this.tableData;
+                                }
+                            }
+                        }).$on('refreshTable', function () {
+                            _this.search();
+                        });
+                        b.$mount('#btnFrom-' + btn.btnId);
+                    });
+                }
             }
         }
     }

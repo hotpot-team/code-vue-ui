@@ -1,9 +1,16 @@
 <style lang="scss" scoped>
-
+    .single-form{
+        @include compatibleFlex;
+        flex-wrap: wrap;
+        -ms-flex-wrap: wrap;
+        &>div{
+            min-width: 30%;
+        }
+    }
 </style>
 <template>
     <div style="margin-right: 48px">
-        <Form ref="formValidate" :model="formData" :rules="ruleValidate" :label-width="100" @submit.native.prevent>
+        <Form ref="formValidate" :model="formData" :rules="ruleValidate" :label-width="100" @submit.native.prevent :class="singleClass + '-form'">
             <FormItem v-for="(item, index) in formItemList" v-if="item.isShow || item.required" :key="index" :label="item.title || item.name" :prop="item.name">
                 <RadioGroup v-if="item.isRadio" v-model="formData[item.name]">
                     <Radio v-for="(opt, index) in dictList[item.name]" :label="opt.value" :key="index">{{opt.name}}</Radio>
@@ -14,8 +21,9 @@
                 <Select v-else-if="treeConfig && item.name === treeConfig.parentId" v-model="formData[item.name]">
                     <Option v-for="opt in treeData" :value="opt[treeConfig.value]" :key="opt[treeConfig.value]">{{opt[treeConfig.label]}}</Option>
                 </Select>
-                <DatePicker style="width: 100%" v-else-if="item.format == 'date-time'" type="date" v-model="formData[item.name]" :format="item.pattern"></DatePicker>
+                <DatePicker style="width: 100%" v-else-if="item.format == 'date-time' || item.isDatePicker" :type="item.dateType||'date'" v-model="formData[item.name]" :format="item.pattern"></DatePicker>
                 <person-input v-else-if="item.personInput && item.personInput.length > 0"  :single="item.personInput.indexOf('single') > -1" :person="item.personInput.indexOf('person') > -1" :org="item.personInput.indexOf('org') > -1" :team="item.personInput.indexOf('team') > -1" v-model="formData[item.name]"></person-input>
+                <UploadFile v-else-if="item.fileId && item.fileId !== ''" v-model="formData[item.name]" :file-id.sync="formData[item.fileId]"></UploadFile>
                 <Input v-else v-model="formData[item.name]" :type="item.isTextArea?'textarea':'text'"></Input>
             </FormItem>
 
@@ -27,6 +35,7 @@
 </template>
 <script type="text/ecmascript-6">
 import Vue from 'vue';
+import UploadFile from '../upload-file/upload-file';
 export default {
     data() {
         return {
@@ -46,7 +55,14 @@ export default {
         },
         treeConfig: {
             type: Object
+        },
+        singleClass:{
+            type: String,
+            default: 'normal'
         }
+    },
+    components:{
+        UploadFile
     },
     created(){
         const validateRequired = (rule, value, callback) => {
@@ -107,7 +123,7 @@ export default {
                 let detailUrl = this.editUrl(data, this.config.pathmag.detail.uri);
                 this.$http[this.config.pathmag.detail.method.toLowerCase()](detailUrl).then((response) => {
                     if (response.status === 200) {
-                        this.formData = {};
+                        this.clearData();
                         this.formData = Object.assign({}, this.formData, response.data[this.tableName]);
                         resolve(this.formData);
                     }

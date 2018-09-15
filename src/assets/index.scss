@@ -1,0 +1,24 @@
+@mixin compatibleFlex{
+  display: -ms-flexbox;
+  display: flex;
+}
+
+@mixin flex-justify($type:'justify'){
+  flex-direction: row;
+  -ms-flex-direction: row;
+  @if($type == 'justify'){
+    justify-content: space-between;
+    -ms-flex-pack: justify;
+  } @else if($type == 'center'){
+    justify-content: center;
+    -ms-flex-pack: center;
+  } @else if($type == 'flex-start'){
+    justify-content: flex-start;
+    -ms-flex-pack: start;
+  }
+}
+
+@mixin flex-direction($type) {
+  flex-direction: unquote($type);
+  -ms-flex-direction: unquote($type);
+}

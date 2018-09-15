@@ -90,12 +90,12 @@
                 <Button type="info" v-if="!stats.form.isNewNode" :disabled="judgeConfForb || !judgeConf" @click="nodeConf">配置</Button>
                 <Button type="info" @click="nodeSave">保存</Button>
             </div>
-            <div v-if="!stats.tree.isSelecteOn" style="display: flex; justify-content: center; align-items: center">
+            <div v-if="!stats.tree.isSelecteOn" class="tip-message">
                 <p>可选择目录或点击新建</p>
             </div>
         </Card>
         <Modal v-model="stats.form.iconModal" title="图标选择" class="icon-modal-style" :scrollable="true">
-            <div style="display: flex;flex-direction: row;flex-wrap: wrap">
+            <div style="flex-wrap: wrap; -ms-flex-wrap: wrap">
                 <span v-for="(item, index) in stats.form.iconList" class="icon-item" @click="iconSelect(item)">
                     <Icon :type="item" :key="index"></Icon>
                 </span>
@@ -140,8 +140,8 @@
                         iconModal: false,
                         iconList: iconList,
                         isNewNode: false, //是否为新增
-                        delForbidden: ['1','11','111','112','113','12','13','131','132','2','14','15'],
-                        confForbidden: ['1','11','111','112','113','12','13','131','132','2','14','15']
+                        delForbidden: ['1','11','111','112','113','12','13','131','132','2','14','15', '16', '17'],
+                        confForbidden: ['1','11','111','112','113','12','13','131','132','2','14','15', '16', '17']
                     }
                 },
                 formValid: {
@@ -499,10 +499,10 @@
 </script>
 <style lang="scss" scoped>
     .cardContainer {
-        display: flex;
+        @include compatibleFlex;
         flex-flow: row nowrap;
         padding: 16px;
-        justify-content: space-between;
+        @include flex-justify;
     }
     .cardItem:nth-child(1) {
         width: 30%;
@@ -512,13 +512,20 @@
     }
 
     .formButtons {
-        display: flex;
-        flex-flow: row nowrap;
-        justify-content: center;
+        @include compatibleFlex;
+        /*flex-flow: row nowrap;*/
+        @include flex-justify('center');
         button {
             margin: 0 6px;
         }
     }
+
+    .tip-message{
+        @include compatibleFlex;
+        @include flex-justify('center');
+        align-items: center
+    }
+
     .icon-item {
         margin: 8px;
         i {

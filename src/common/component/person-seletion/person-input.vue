@@ -1,7 +1,7 @@
 <style lang="scss" scoped>
     .person-select-content {
-        display: flex;
-        justify-content: space-between;
+        @include compatibleFlex;
+        @include flex-justify;
         .left-content, .right-content {
             height: 100%;
             display: inline-block;
@@ -13,8 +13,8 @@
                     height: calc(100% - 38px);
                     .person-page {
                         margin-top: 4px;
-                        display: flex;
-                        justify-content: space-between;
+                        @include compatibleFlex;
+                        @include flex-justify;
                         line-height: 24px;
                     }
                     .person-search {
@@ -50,8 +50,8 @@
             }
         }
         .control {
-            display: flex;
-            flex-direction: column;
+            @include compatibleFlex;
+            @include flex-direction(column);
             margin: auto 0;
             .control-btn {
                 margin-bottom: 8px;
@@ -234,14 +234,10 @@
                 default: 'input'
             },
             shape: {
-                validator (value) {
-                    return oneOf(value, ['circle', 'circle-outline']);
-                }
+                type: String
             },
             size: {
-                validator (value) {
-                    return oneOf(value, ['small', 'large', 'default']);
-                }
+                type: String
             },
             loading: Boolean,
             disabled: Boolean,

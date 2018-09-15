@@ -1,8 +1,9 @@
 <style lang="scss" scoped>
     .panel-row{
-        display: flex;
-        flex-direction: row;
+        @include compatibleFlex;
+        @include flex-direction(row);
         flex-wrap: wrap;
+        -ms-flex-wrap: wrap;
     }
 </style>
 <template>
@@ -34,6 +35,3 @@
         }
     };
 </script>
-<style>
-
-</style>

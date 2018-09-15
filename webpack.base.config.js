@@ -8,7 +8,7 @@ module.exports = {
         vendors: './src/vendors'
     },
     output: {
-        path: path.join(__dirname, './dist')
+        path: path.join(__dirname, './dist'),
     },
     module: {
         rules: [
@@ -19,13 +19,28 @@ module.exports = {
                     options: {
                         loaders: {
                             less: ExtractTextPlugin.extract({
-                                use: ['css-loader?minimize', 'autoprefixer-loader', 'less-loader'],
+                                use: ['css-loader?minimize', 'less-loader'],
                                 fallback: 'vue-style-loader'
                             }),
                             css: ExtractTextPlugin.extract({
-                                use: ['css-loader', 'autoprefixer-loader', 'less-loader'],
+                                use: ['css-loader', 'less-loader'],
                                 fallback: 'vue-style-loader'
-                            })
+                            }),
+                            scss: ['vue-style-loader', 'css-loader','sass-loader',{
+                                loader: 'sass-resources-loader',
+                                options: {
+                                    resources:  path.resolve(__dirname, './src/assets/index.scss'),
+                                },
+                            }]
+                            // scss: ExtractTextPlugin.extract({
+                            //     use: ['css-loader', 'postcss-loader', 'sass-loader',{
+                            //         loader: 'sass-resources-loader',
+                            //         options: {
+                            //             resources:  path.resolve(__dirname, './src/assets/index.scss'),
+                            //         },
+                            //     }],
+                            //     fallback: 'vue-style-loader'
+                            // }),
                         }
                     }
                 },
@@ -49,7 +64,7 @@ module.exports = {
             {
                 test: /\.css$/,
                 use: ExtractTextPlugin.extract({
-                    use: ['css-loader?minimize', 'autoprefixer-loader'],
+                    use: ['css-loader?minimize'],
                     fallback: 'style-loader'
                 })
             },
@@ -57,7 +72,7 @@ module.exports = {
             {
                 test: /\.sass/,
                 use: ExtractTextPlugin.extract({
-                    use: ['autoprefixer-loader', 'sass-loader'],
+                    use: [ 'sass-loader'],
                     fallback: 'style-loader'
                 })
             },

@@ -2,7 +2,8 @@
   "presets": [
     ["es2015", {
       "modules": false
-    }]
+    }],
+    "stage-2"
   ],
   "plugins": ["transform-object-rest-spread",[
     "component",
@@ -10,5 +11,5 @@
       "libraryName": "element-ui",
       "styleLibraryName": "theme-chalk"
     }
-  ],"syntax-dynamic-import"]
+  ],"syntax-dynamic-import","transform-vue-jsx", "transform-runtime"]
 }

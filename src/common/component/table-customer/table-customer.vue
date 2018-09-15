@@ -1,7 +1,7 @@
 <style lang="scss" scoped>
     .url-header {
-        display: flex;
-        flex-direction: row;
+        @include compatibleFlex;
+        @include flex-direction(row);
         margin-bottom: 16px;
 
         label {
@@ -33,8 +33,8 @@
     }
 
     .config-table{
-        display: flex;
-        flex-direction: row;
+        @include compatibleFlex;
+        @include flex-direction(row);
         .table-style{
             margin-right: 16px;
             width: calc(100% - 380px);
@@ -52,8 +52,8 @@
     }
 
     .btn-config{
-        display: flex;
-        justify-content: space-between;
+        @include compatibleFlex;
+        @include flex-justify;
         margin-top: 16px;
         .btn-config-item{
             margin-right: 16px;
@@ -116,13 +116,16 @@
                     <FormItem label="展示名" prop="title">
                         <Input v-model="data[currentIndex].title" :disabled="schemaData.relations && schemaData.relations[data[currentIndex].name] && !schemaData.relations[data[currentIndex].name].master"></Input>
                     </FormItem>
+                    <FormItem label="格式化" prop="title">
+                        <Input v-model="data[currentIndex].renderFormat" :disabled="data[currentIndex].type==='object' || data[currentIndex].type==='array' || data[currentIndex].dictName != null"></Input>
+                    </FormItem>
                     <FormItem label="查询方式">
                         <RadioGroup v-model="data[currentIndex].searchModel" on-change="radioChange">
-                            <Radio label="EQ" :disabled="data[currentIndex].type==='object' || data[currentIndex].type==='array'">
-                                <span>EQ(等于)</span>
-                            </Radio>
                             <Radio label="LIKE" :disabled="data[currentIndex].type==='object' || data[currentIndex].type==='array'">
                                 <span>LIKE(模糊匹配)</span>
+                            </Radio>
+                            <Radio label="EQ" :disabled="data[currentIndex].type==='object' || data[currentIndex].type==='array'">
+                                <span>EQ(等于)</span>
                             </Radio>
                             <Radio label="GTE" :disabled="data[currentIndex].type==='object' || data[currentIndex].type==='array'">
                                 <span>GTE(大于等于)</span>
@@ -137,11 +140,25 @@
                     </FormItem>
                     <FormItem label="人员选择器">
                         <CheckboxGroup v-model="data[currentIndex].personInput">
-                            <Checkbox label="single"><span>单选</span></Checkbox>
-                            <Checkbox label="person"><span>人员</span></Checkbox>
-                            <Checkbox label="org"><span>组织</span></Checkbox>
-                            <Checkbox v-if="showTeam" label="team"><span>群组</span></Checkbox>
+                            <Checkbox label="single" :disabled="data[currentIndex].type==='object' || data[currentIndex].type==='array'"><span>单选</span></Checkbox>
+                            <Checkbox label="person" :disabled="data[currentIndex].type==='object' || data[currentIndex].type==='array'"><span>人员</span></Checkbox>
+                            <Checkbox label="org" :disabled="data[currentIndex].type==='object' || data[currentIndex].type==='array'"><span>组织</span></Checkbox>
+                            <Checkbox v-if="showTeam" label="team" :disabled="data[currentIndex].type==='object' || data[currentIndex].type==='array'"><span>群组</span></Checkbox>
                         </CheckboxGroup>
+                    </FormItem>
+                    <FormItem>
+                        <Tooltip slot="label" placement="top">
+                            附件ID
+                            <div slot="content">指定该字段为附件的名称，选择对应的附件id</div>
+                        </Tooltip>
+                        <Select v-model="data[currentIndex].fileId" :disabled="isDisabled" clearable>
+                            <Option v-for="item in data" :value="item.name" :key="item.name">{{item.name}}</Option>
+                        </Select>
+                    </FormItem>
+                    <FormItem label="字典">
+                        <Select v-model="data[currentIndex].dictName" :disabled="isDisabled" clearable>
+                            <Option v-for="item in dictstroage" :value="item.code" :key="item.id">{{item.name}}</Option>
+                        </Select>
                     </FormItem>
                 </Form>
             </div>
@@ -180,7 +197,8 @@
     import MyTable from '../table/table.vue';
     import Util from '../../../libs/util';
     import TableShow from './table-showExt.vue';
-
+    import FormItem from '../form-item-ext/form-item';
+    import { mapGetters } from 'vuex';
     export default {
         data() {
             return {
@@ -299,7 +317,7 @@
                 buttons: [],
                 buttonConfigs:[],
                 rowButtonConfigs:[],
-                showTeam: false
+                showTeam: false,
             };
         },
         created() {
@@ -356,8 +374,15 @@
                     columsData[i].description = columsData[i].name;
                 }
                 this.$set(columsData[i], 'title', columsData[i].description);
-                this.$set(columsData[i], 'searchModel', 'EQ');
+                this.$set(columsData[i], 'searchModel', 'LIKE');
                 this.$set(columsData[i], 'personInput', []);
+
+                if (!columsData[i].renderFormat) {
+                    this.$set(columsData[i], 'renderFormat', '');
+                    if (columsData[i].format && columsData[i].format === 'date-time') {
+                        columsData[i].renderFormat = columsData[i].pattern;
+                    }
+                }
 
                 //载入树形父节点配置
                 if (this.showType === 'tree' &&  this.config && this.config.tabConfigData && this.config.tabConfigData.treeParent) {
@@ -390,10 +415,14 @@
         },
         props: ['menuId', 'config', 'schemaData', 'configMenuName', 'noBtn', 'showType'],
         components: {
+            FormItem,
             'my-table': MyTable,
             'table-show': TableShow
         },
         computed: {
+            isDisabled: function(){
+              return this.data[this.currentIndex].type==='object' || this.data[this.currentIndex].type==='array';
+            },
             showConfig:function () {
                 let tabConfigData = Object.assign({}, this.checkBoxs);
                 tabConfigData.importExcelConfig = this.importExcelConfig;
@@ -439,7 +468,10 @@
                     tableBtnConfigs: tableBtnConfigs,
                     tableRowBtnConfigs: tableRowBtnConfigs
                 };
-            }
+            },
+            ...mapGetters([
+                'dictstroage'
+            ])
         },
         methods: {
             reloadTable(oldIndex, newIndex) {
@@ -482,6 +514,11 @@
                 }
             },
             addButton(row){
+                if (this.buttons.length < 1) {
+                    this.$Message.warning('请先在菜单管理中添加按钮！');
+                    return;
+                }
+
                 if (row) {
                     this.rowButtonConfigs.push({
                         btnName: this.buttons[0].functionName,
